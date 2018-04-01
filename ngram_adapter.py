@@ -27,6 +27,7 @@ def adj_to_gender(adjective, gender):
         if gender == 'ж':
             return stem + adj_endings_female_soft[0]
         return stem + adj_endings_neuter_soft[0]
+    return adjective
 
 
 def noun_to_genitive(noun, gender):
@@ -38,7 +39,7 @@ def noun_to_genitive(noun, gender):
         if gender == 'ж':
             return stem + 'и'
     if ending == 'а':
-        if stem[-1:] in ['г', 'к', 'х']:
+        if stem[-1:] in ['г', 'к', 'х', 'ч', 'щ']:
             return stem + 'и'
         return stem + 'ы'
     if ending == 'я':
@@ -72,6 +73,7 @@ def adj_to_genitive(adjective, gender):
         elif gender == 'ж':
             return stem + adj_endings_female_soft[1]
         return stem + adj_endings_neuter_soft[1]
+    return adjective
 
 
 def build_noun_dictionary(filename):
@@ -80,6 +82,8 @@ def build_noun_dictionary(filename):
     for str in file:
         str = str.strip('\n')
         str = str.split('=')
+        if len(str) < 2:
+            continue
         lemma = str[0]
         info = str[1]
         if 'S' in info:
@@ -92,36 +96,43 @@ def build_noun_dictionary(filename):
     return dict
 
 
-dictionary = build_noun_dictionary('test_out.txt')
+def adapt_ngrams(ngrams_file, dict_file, result_file):
+    dictionary = build_noun_dictionary(dict_file)
 
-ngrams = open(file='test_bigrams.txt', encoding='utf-8').read().split('\n')
-adapted_ngrams = []
+    ngrams = open(file=ngrams_file, encoding='utf-8').read().split('\n')
+    adapted_ngrams = []
 
-for ngram in ngrams:
-    ngram = ngram.split('|')[0]
-    if ngram.count(' ') == 1:
-        word1 = ngram.split(' ')[0]
-        word2 = ngram.split(' ')[1]
-        if word1 in dictionary and word2 in dictionary:
-            word2 = noun_to_genitive(word2, dictionary[word2])
-        elif word2 in dictionary:
-            word1 = adj_to_gender(word1, dictionary[word2])
-        adapted_ngrams.append(word1 + ' ' + word2)
-    if ngram.count(' ') == 2:
-        word1 = ngram.split(' ')[0]
-        word2 = ngram.split(' ')[1]
-        word3 = ngram.split(' ')[2]
-        if word1 in dictionary and word2 in dictionary and word3 in dictionary:
-            word2 = noun_to_genitive(word2, dictionary[word2])
-            word3 = noun_to_genitive(word3, dictionary[word3])
-        if word1 in dictionary and word3 in dictionary:
-            word2 = adj_to_genitive(word2, dictionary[word3])
-            word3 = noun_to_genitive(word3, dictionary[word3])
-        adapted_ngrams.append(word1 + ' ' + word2 + ' ' + word3)
+    for ngram in ngrams:
+        if len(ngram) < 3:
+            continue
+        ngram = ngram.split('|')[0]
+        if ngram.count(' ') == 0:
+            adapted_ngrams.append(ngram)
+        if ngram.count(' ') == 1:
+            word1 = ngram.split(' ')[0]
+            word2 = ngram.split(' ')[1]
+            if word1 in dictionary and word2 in dictionary:
+                word2 = noun_to_genitive(word2, dictionary[word2])
+            elif word2 in dictionary:
+                word1 = adj_to_gender(word1, dictionary[word2])
+            adapted_ngrams.append(word1 + ' ' + word2)
+        if ngram.count(' ') == 2:
+            word1 = ngram.split(' ')[0]
+            word2 = ngram.split(' ')[1]
+            word3 = ngram.split(' ')[2]
+            if word1 in dictionary and word2 in dictionary and word3 in dictionary:
+                word2 = noun_to_genitive(word2, dictionary[word2])
+                word3 = noun_to_genitive(word3, dictionary[word3])
+            if word1 in dictionary and word3 in dictionary:
+                word2 = adj_to_genitive(word2, dictionary[word3])
+                word3 = noun_to_genitive(word3, dictionary[word3])
+            adapted_ngrams.append(word1 + ' ' + word2 + ' ' + word3)
 
+    out = open(file=result_file, mode='w', encoding='utf-8')
+    for w in adapted_ngrams:
+        #print(w)
+        out.write(w + '\n')
 
-for w in adapted_ngrams:
-    print(w)
 
 
 
