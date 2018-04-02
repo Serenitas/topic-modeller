@@ -37,10 +37,12 @@ def noun_to_genitive(noun, gender):
         if gender == 'ж':
             return stem + 'и'
     if ending == 'а':
-        if stem[-1:] in ['г', 'к', 'х', 'ч', 'щ']:
+        if stem[-1:] in ['г', 'к', 'х', 'ч', 'щ', 'ш']:
             return stem + 'и'
         return stem + 'ы'
     if ending == 'я':
+        if stem[-1:] == 'м':
+            return stem + 'ени'
         return stem + 'и'
     if ending == 'е' or ending == 'й':
         return stem + 'я'
