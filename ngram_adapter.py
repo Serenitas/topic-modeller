@@ -101,6 +101,8 @@ def adapt_ngrams(ngrams_file, dict_file, result_file):
 
     ngrams = open(file=ngrams_file, encoding='utf-8').read().split('\n')
     adapted_ngrams = []
+    multiword_only = []
+    multiword_adapted = []
 
     for ngram in ngrams:
         if len(ngram) < 3:
@@ -113,9 +115,12 @@ def adapt_ngrams(ngrams_file, dict_file, result_file):
             word2 = ngram.split(' ')[1]
             if word1 in dictionary and word2 in dictionary:
                 word2 = noun_to_genitive(word2, dictionary[word2])
+                multiword_adapted.append(word1 + ' ' + word2)
             elif word2 in dictionary:
                 word1 = adj_to_gender(word1, dictionary[word2])
+                multiword_adapted.append(word1 + ' ' + word2)
             adapted_ngrams.append(word1 + ' ' + word2)
+            multiword_only.append(word1 + ' ' + word2)
         if ngram.count(' ') == 2:
             word1 = ngram.split(' ')[0]
             word2 = ngram.split(' ')[1]
@@ -123,15 +128,21 @@ def adapt_ngrams(ngrams_file, dict_file, result_file):
             if word1 in dictionary and word2 in dictionary and word3 in dictionary:
                 word2 = noun_to_genitive(word2, dictionary[word2])
                 word3 = noun_to_genitive(word3, dictionary[word3])
+                multiword_adapted.append(word1 + ' ' + word2 + ' ' + word3)
             if word1 in dictionary and word3 in dictionary:
                 word2 = adj_to_genitive(word2, dictionary[word3])
                 word3 = noun_to_genitive(word3, dictionary[word3])
+                multiword_adapted.append(word1 + ' ' + word2 + ' ' + word3)
             adapted_ngrams.append(word1 + ' ' + word2 + ' ' + word3)
+            multiword_only.append(word1 + ' ' + word2 + ' ' + word3)
 
     out = open(file=result_file, mode='w', encoding='utf-8')
+    out2 = open(file='adapted.txt', mode='w', encoding='utf-8')
     for w in adapted_ngrams:
         #print(w)
         out.write(w + '\n')
+    for w in multiword_adapted:
+        out2.write(w + '\n')
 
 
 

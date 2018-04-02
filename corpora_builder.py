@@ -13,7 +13,7 @@ args_dictionary = [mystem_path, '-indl',  out_file, out_dictionary]
 
 python_path = './venv2/Scripts/python.exe'
 turbotopics_path = './turbotopics/compute_ngrams.py'
-args_turbotopics = [python_path, turbotopics_path, '--corpus=' + out_lemmatized, '--pval=0.01', '--min-count=10',
+args_turbotopics = [python_path, turbotopics_path, '--corpus=' + out_lemmatized, '--pval=0.001', '--min-count=30',
                     '--out=' + out_ngrams]
 
 
