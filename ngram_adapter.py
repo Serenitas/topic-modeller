@@ -1,5 +1,4 @@
-from nltk.stem.snowball import RussianStemmer
-import pymorphy2 as morph
+import adjective_stemmer as stemmer
 
 adj_endings_male_hard = ['ый', 'ого', 'ому', 'ым', 'ом', 'ой']
 adj_endings_male_soft = ['ий', 'его', 'ему', 'им', 'ем']
@@ -10,7 +9,6 @@ adj_endings_neuter_soft = ['ее', 'его', 'ему', 'им', 'ем']
 
 
 def adj_to_gender(adjective, gender):
-    stemmer = RussianStemmer()
     stem = stemmer.stem(adjective)
     ending = adjective[len(stem):]
     if gender == 'м':
@@ -52,7 +50,6 @@ def noun_to_genitive(noun, gender):
 
 
 def adj_to_genitive(adjective, gender):
-    stemmer = RussianStemmer()
     stem = stemmer.stem(adjective)
     ending = adjective[len(stem):]
     if ending in adj_endings_male_hard:
@@ -87,6 +84,26 @@ def build_noun_dictionary(filename):
         lemma = str[0]
         info = str[1]
         if 'S' in info:
+            if 'муж' in info:
+                dict[lemma] = 'м'
+            if 'жен' in info:
+                dict[lemma] = 'ж'
+            if 'сред' in info:
+                dict[lemma] = 'с'
+    return dict
+
+
+def build_adj_dictionary(filename):
+    dict = {}
+    file = open(file=filename, encoding='utf-8').readlines()
+    for str in file:
+        str = str.strip('\n')
+        str = str.split('=')
+        if len(str) < 2:
+            continue
+        lemma = str[0]
+        info = str[1]
+        if 'A' in info:
             if 'муж' in info:
                 dict[lemma] = 'м'
             if 'жен' in info:

@@ -1,0 +1,1106 @@
+Topic Modeling: Beyond Bag-of-Words
+
+Hanna M. Wallach
+Cavendish Laboratory, University of Cambridge, Cambridge CB3 0HE, UK
+
+Abstract
+Some models of textual corpora employ text
+generation methods involving n-gram statistics, while others use latent topic variables
+inferred using the “bag-of-words” assumption, in which word order is ignored. Previously, these methods have not been combined. In this work, I explore a hierarchical generative probabilistic model that incorporates both n-gram statistics and latent
+topic variables by extending a unigram topic
+model to include properties of a hierarchical Dirichlet bigram language model. The
+model hyperparameters are inferred using a
+Gibbs EM algorithm. On two data sets, each
+of 150 documents, the new model exhibits
+better predictive accuracy than either a hierarchical Dirichlet bigram language model
+or a unigram topic model. Additionally, the
+inferred topics are less dominated by function words than are topics discovered using
+unigram statistics, potentially making them
+more meaningful.
+
+1. Introduction
+Recently, much attention has been given to generative probabilistic models of textual corpora, designed
+to identify representations of the data that reduce description length and reveal inter- or intra-document
+statistical structure. Such models typically fall into
+one of two categories—those that generate each word
+on the basis of some number of preceding words or
+word classes and those that generate words based on
+latent topic variables inferred from word correlations
+independent of the order in which the words appear.
+n-gram language models make predictions using observed marginal and conditional word frequencies.
+Appearing in Proceedings of the 23 rd International Conference on Machine Learning, Pittsburgh, PA, 2006. Copyright 2006 by the author(s)/owner(s).
+
+hmw26@cam.ac.uk
+
+While such models may use conditioning contexts of
+arbitrary length, this paper deals only with bigram
+models—i.e., models that predict each word based on
+the immediately preceding word.
+To develop a bigram language model, marginal and
+conditional word counts are determined from a corpus
+w. The marginal count Ni is defined as the number
+of times that word i has occurred in the corpus, while
+the conditional count Ni|j is the number of times word
+i immediately follows word j. Given these counts, the
+aim of bigram language modeling is to develop predictions of word wt given word wt−1 , in any document. Typically this is done by computing estimators
+of both the marginal probability of word i and the conditional probability of word i following word j, such as
+fi = Ni /N and fi|j = Ni|j /Nj , where N is the number of words in the corpus. If there were sufficient
+data available, the observed conditional frequency fi|j
+could be used as an estimator for the predictive probability of i given j. In practice, this does not provide
+a good estimate: only a small fraction of possible i, j
+word pairs will have been observed in the corpus. Consequently, the conditional frequency estimator has too
+large a variance to be used by itself.
+To alleviate this problem, the bigram estimator fi|j is
+smoothed by the marginal frequency estimator fi to
+give the predictive probability of word i given word j:
+P (wt = i|wt−1 = j) = λfi + (1 − λ)fi|j .
+
+(1)
+
+The parameter λ may be fixed, or determined from
+the data using techniques such as cross-validation (Jelinek & Mercer, 1980). This procedure works well in
+practice, despite its somewhat ad hoc nature.
+The hierarchical Dirichlet language model (MacKay &
+Peto, 1995) is a bigram model that is entirely driven by
+principles of Bayesian inference. This model has a similar predictive distribution to models based on equation (1), with one key difference: the bigram statistics
+fi|j in MacKay and Peto’s model are not smoothed
+with marginal statistics fi , but are smoothed with a
+quantity related to the number of different contexts in
+which each word has occurred.
+
+Topic Modeling: Beyond Bag-of-Words
+
+Latent Dirichlet allocation (Blei et al., 2003) provides
+an alternative approach to modeling textual corpora.
+Documents are modeled as finite mixtures over an underlying set of latent topics inferred from correlations
+between words, independent of word order.
+
+the vocabulary. These parameters are denoted by the
+matrix Φ, with P (wt = i|wt−1 = j) ≡ φi|j . Φ may be
+thought of as a transition probability matrix, in which
+the j th row, the probability vector for transitions from
+word j, is denoted by the vector φj .
+
+This bag-of-words assumption makes sense from a
+point of view of computational efficiency, but is unrealistic. In many language modeling applications, such
+as text compression, speech recognition, and predictive
+text entry, word order is extremely important. Furthermore, it is likely that word order can assist in topic
+inference. The phrases “the department chair couches
+offers” and “the chair department offers couches” have
+the same unigram statistics, but are about quite different topics. When deciding which topic generated
+the word “chair” in the first sentence, knowing that it
+was immediately preceded by the word “department”
+makes it much more likely to have been generated by
+a topic that assigns high probability to words related
+to university administration.
+
+Given a corpus w, the likelihood function is
+Y Y Ni|j
+P (w|Φ) =
+φi|j ,
+
+In practice, the topics inferred using latent Dirichlet allocation are heavily dominated by function words, such
+as “in”, “that”, “of” and “for”, unless these words are
+removed from corpora prior to topic inference. While
+removing these may be appropriate for tasks where
+word order does not play a significant role, such as
+information retrieval, it is not appropriate for many
+language modeling applications, where both function
+and content words must be accurately predicted.
+In this paper, I present a hierarchical Bayesian model
+that integrates bigram-based and topic-based approaches to document modeling. This model moves
+beyond the bag-of-words assumption found in latent Dirichlet allocation by introducing properties of
+MacKay and Peto’s hierarchical Dirichlet language
+model. In addition to exhibiting better predictive
+performance than either MacKay and Peto’s language
+model or latent Dirichlet allocation, the topics inferred
+using the new model are typically less dominated by
+function words than are topics inferred from the same
+corpora using latent Dirichlet allocation.
+
+2. Background
+I begin with brief descriptions of MacKay and Peto’s
+hierarchical Dirichlet language model and Blei et al.’s
+latent Dirichlet allocation.
+
+i
+
+(2)
+
+j
+
+where Ni|j is the number of times that word i immediately follows word j in the corpus.
+MacKay and Peto (1995) extend this basic framework
+by placing a Dirichlet prior over Φ:
+Y
+P (Φ|βm) =
+Dirichlet(φj |βm),
+(3)
+j
+
+where β > 0 and m is a measure satisfying
+
+P
+
+i
+
+mi = 1.
+
+Combining equations (2) and (3), and integrating over
+Φ, yields the probability of the corpus given the hyperparameters βm, also known as the “evidence”:
+Q
+Y
+Γ(β)
+i Γ(Ni|j + βmi )
+Q
+. (4)
+P (w|βm) =
+Γ(Nj + β)
+i Γ(βmi )
+j
+It is also easy to obtain a predictive distribution for
+each context j given the hyperparameters βm:
+P (i|j, w, βm) =
+
+Ni|j + βmi
+.
+Nj + β
+
+(5)
+
+To make the relationship to equation (1) explicit,
+P (i|j, w, βm) may be rewritten as
+P (i|j, w, βm) = λj mi + (1 − λj )fi|j ,
+
+(6)
+
+where fi|j = Ni|j /Nj and
+λj =
+
+β
+.
+Nj + β
+
+(7)
+
+The hyperparameter mi is now taking the role of the
+marginal statistic fi in equation (1).
+Ideally, the measure βm should be given a proper prior
+and marginalized over when making predictions, yielding the true predictive distribution:
+Z
+P (i|j, w) = P (βm|w)P (i|j, w, βm) d(βm). (8)
+
+2.1. Hierarchical Dirichlet Language Model
+Bigram language models are specified by a conditional
+distribution P (wt = i|wt−1 = j), described by W (W −
+1) free parameters, where W is the number of words in
+
+However, if P (βm|w) is sharply peaked in βm so
+that that it is effectively a delta function, then the
+true predictive distribution may be approximated by
+P (i|j, w, [βm]MP ), where [βm]MP is the maximum of
+
+Topic Modeling: Beyond Bag-of-Words
+
+P (βm|w). Additionally, the prior over βm may be
+assumed to be uninformative, yielding a minimal datadriven Bayesian model in which the optimal βm may
+be determined from the data by maximizing the evidence. MacKay and Peto show that each element of
+the optimal m, when estimated using this “empirical
+Bayes” procedure, is related to the number of contexts
+in which the corresponding word has appeared.
+
+corpus given the hyperparameters:
+P (w|αn, βm) =
+Q
+X Y
+Γ(β)
+i Γ(Ni|k + βmi )
+Q
+Γ(N
++
+β)
+k
+i Γ(βmi )
+z
+k
+!
+Q
+Y
+Γ(α)
+k Γ(Nk|d + αnk )
+Q
+.
+Γ(Nd + α)
+k Γ(αnk )
+
+(12)
+
+d
+
+2.2. Latent Dirichlet Allocation
+Latent Dirichlet allocation (Blei et al., 2003) represents documents as random mixtures over latent topics, where each topic is characterized by a distribution
+over words. Each word wt in a corpus w is assumed to
+have been generated by a latent topic zt , drawn from
+a document-specific distribution over T topics.
+Word generation is defined by a conditional distribution P (wt = i|zt = k), described by T (W − 1) free
+parameters, where T is the number of topics and W is
+the size of the vocabulary. These parameters are denoted by Φ, with P (wt = i|zt = k) ≡ φi|k . Φ may be
+thought of as an emission probability matrix, in which
+the k th row, the distribution over words for topic k, is
+denoted by φk . Similarly, topic generation is characterized by a conditional distribution P (zt = k|dt = d),
+described by D(T − 1) free parameters, where D is the
+number of documents in the corpus. These parameters
+form a matrix Θ, with P (zt = k|dt = d) ≡ θk|d . The
+dth row of this matrix is the distribution over topics
+for document d, denoted by θ d .
+The joint probability of a corpus w and a set of corresponding latent topics z is
+P (w, z|Φ, Θ) =
+
+YYY
+i
+
+k
+
+N
+
+N
+
+φi|ki|k θk|dk|d ,
+
+(9)
+
+d
+
+where Ni|k is the number of times that word i has been
+generated by topic k, and Nk|d is the number of times
+topic k has been used in document d.
+Blei et al. place a Dirichlet prior over Φ,
+
+Nk is the total number of times topic k occurs in z,
+while Nd is the number of words in document d.
+The sum over z cannot be computed directly because
+it does not factorize and involves T N terms, where N
+is the total number of words in the corpus. However,
+it may be approximated using Markov chain Monte
+Carlo (Griffiths & Steyvers, 2004).
+Given a corpus w, a set of latent topics z, and optimal hyperparameters [αn]MP and [βm]MP , approximate predictive distributions for each topic k and document d are given by the following pair of equations:
+Ni|k + [βmi ]MP
+Nk + β MP
+Nk|d + [αnk ]MP
+P (k|d, w, z, [αn]MP ) =
+.
+Nd + αMP
+
+P (i|k, w, z, [βm]MP ) =
+
+(13)
+(14)
+
+These may be rewritten as
+P (i|k, z, w, βm) = λk fi|k + (1 − λk )mi
+
+(15)
+
+P (k|d, z, w, αn) = γd fk|d + (1 − γd )nd ,
+
+(16)
+
+where fi|k = Ni|k /Nk , fk|d = Nk|d /Nd and
+β
+Nk + β
+α
+γd =
+.
+Nd + α
+
+λk =
+
+(17)
+(18)
+
+fi|k is therefore being smoothed by the hyperparameter mi , while fk|d is smoothed by nk . Note the similarity of equations (15) and (16) to equation (6).
+
+(10)
+
+3. Bigram Topic Model
+
+(11)
+
+This section introduces a model that extends latent
+Dirichlet allocation by incorporating a notion of word
+order, similar to that employed by MacKay and Peto’s
+hierarchical Dirichlet language model. Each topic is
+now represented by a set of W distributions.
+
+Combining these priors with equation (9) and integrating over Φ and Θ gives the evidence for hyperparameters αn and βm, which is also the probability of the
+
+Word generation is defined by a conditional distribution P (wt = i|wt−1 = j, zt = k), described by
+W T (W − 1) free parameters. As before, these parameters form a matrix Φ, this time with W T rows.
+
+P (Φ|βm) =
+
+Y
+
+Dirichlet(φk |βm),
+
+k
+
+and another over Θ,
+P (Θ|αn) =
+
+Y
+
+Dirichlet(θ d |αn).
+
+d
+
+Topic Modeling: Beyond Bag-of-Words
+
+Each row is a distribution over words for a particular context j, k, denoted by φj,k . Each topic k is now
+characterized by the W distributions specific to that
+topic. Topic generation is the same as in latent Dirichlet allocation: topics are drawn from the conditional
+distribution P (zt = k|dt = d), described by D(T − 1)
+free parameters, which form a matrix Θ.
+The joint probability of a corpus w and a single set of
+latent topic assignments z is
+P (w, z|Φ, Θ) =
+
+YYYY
+i
+
+j
+
+k
+
+N
+
+N
+
+i|j,k
+φi|j,k
+θk|dk|d ,
+
+(19)
+
+d
+
+where Ni|j,k is the number of times word i has been
+generated by topic k when preceded by word j. As in
+latent Dirichlet allocation, Nk|d is the number of times
+topic k has been used in document d.
+The prior over Θ is chosen to be the same as that used
+in latent Dirichlet allocation:
+P (Θ|αn) =
+
+Y
+
+Dirichlet(θ d |αn).
+
+(20)
+
+d
+
+However, the additional conditioning context j in
+the distribution that defines word generation affords
+greater flexibility in choosing a hierarchical prior for
+Φ than in either latent Dirichlet allocation or the hierarchical Dirichlet language model. The priors over
+Φ used in both MacKay and Peto’s language model
+and Blei et al.’s latent Dirichlet allocation are “coupled” priors: learning the probability vector for a single context, φj the case of MacKay and Peto’s model
+and φk in Blei et al.’s, gives information about the
+probability vectors in other contexts, j 0 and k 0 respectively. This dependence comes from the hyperparameter vector βm, shared, in the case of the hierarchical
+Dirichlet language model, between all possible previous word contexts j and, in the case of latent Dirichlet
+allocation, between all possible topics k. Since word
+generation is conditioned upon both j and k in the
+new model presented in this paper, there is more than
+one way in which hyperparameters for the prior over
+Φ might be shared in this model.
+
+Prior 2: Alternatively there may be T hyperparameter vectors—one for each topic k:
+YY
+P (Φ|{βk mk }) =
+Dirichlet(φj,k |βk mk ). (22)
+j
+
+k
+
+Information is now shared between only those probability vectors with topic context k. Intuitively, this
+is appealing. Learning about the distribution over
+words for a single context j, k yields information about
+the distributions over words for other contexts j 0 , k
+that share this topic, but not about distributions with
+other topic contexts. In other words, this prior encapsulates the notion of similarity between distributions
+over words for a given topic context.
+Having defined the distributions that characterize
+word and topic generation in the new model and assigned priors over the parameters, the generative process for a corpus w is:
+1. For each topic k and word j:
+(a) Draw φj,k from the prior over Φ:
+ther Dirichlet(φj,k |βm) (prior 1)
+Dirichlet(φj,k |βk mk ) (prior 2).
+
+eior
+
+2. For each document d in the corpus:
+(a) Draw the topic mixture θ d for document d
+from Dirichlet(θ d |αn).
+(b) For each position t in document d:
+i. Draw a topic zt ∼ Discrete(θ d ).
+ii. Draw a word wt from the distribution
+over words for the context defined by
+the topic zt and previous word wt−1 ,
+Discrete(φwt−1 ,zt ).
+The evidence, or probability of a corpus w given the
+hyperparameters, is either (prior 1)
+P (w|αn, βm) =
+
+Q
+X YY
+Γ(β)
+i Γ(Ni|j,k + βmi )
+
+Q
+Γ(Nj,k + β)
+i Γ(βmi )
+z
+j
+k
+!
+Q
+Y
+Γ(α)
+k Γ(Nk|d + αnk )
+Q
+(23)
+Γ(Nd + α)
+k Γ(αnk )
+d
+
+Prior 1: Most simply, a single hyperparameter vector βm may be shared between all j, k contexts:
+P (Φ|βm) =
+
+YY
+j
+
+Dirichlet(φj,k |βm).
+
+(21)
+
+k
+
+Here, knowledge about the probability vector for one
+φj,k will give information about the probability vectors
+φj 0 ,k0 for all other j 0 , k 0 contexts.
+
+or (prior 2)
+P (w|αn, {βk mk }) =
+
+Q
+X YY
+Γ(β)
+i Γ(Ni|j,k + βk mi|k )
+
+Q
+Γ(Nj,k + βk )
+i Γ(βk mi|k )
+z
+j
+k
+!
+Q
+Y
+Γ(α)
+k Γ(Nk|d + αnk )
+Q
+.
+(24)
+Γ(Nd + α)
+k Γ(αnk )
+d
+
+Topic Modeling: Beyond Bag-of-Words
+
+As in latent Dirichlet allocation, the sum over z is
+intractable, but may be approximated using MCMC.
+For a single set of latent topics z, and optimal hyperparameters [βm]MP or {[βk mk ]MP }, the approximate
+predictive distribution over words given previous word
+j and current topic k is either (prior 1)
+MP
+
+P (i|j, k, w, z, [βm]
+
+Ni|j,k + [βmi ]MP
+)=
+Nj,k + β MP
+
+2. Iteration i:
+(a) E-step: Draw S samples {z (s) }Ss=1 from
+P (z|w, U (i−1) ) using a Gibbs sampler.
+(b) M-step: Maximize
+U (i) = arg max
+U
+
+(25)
+
+or (prior 2)
+
+S
+1X
+log P (w, z (s) |U )
+S s=1
+
+3. i ← i + 1 and go to 2.
+4.1. E-Step
+
+P (i|j, k, w, z, {[βk mk ]MP }) =
+Ni|j,k + [βk mi|k ]
+Nj,k + βkMP
+
+MP
+
+.
+
+(26)
+
+In equation (25), the statistic Ni|j,k /Nj,k is always
+smoothed by the quantity mi , regardless of the conditioning context, j, k. Meanwhile, in equation (26),
+Ni|j,k /Nj,k is smoothed by mi|k , which is will vary depending on the conditioning topic k.
+MP
+
+Given [αn] , the approximate predictive distribution
+over topics for document d is
+P (k|d, w, z, [αn]MP ) =
+
+Nk|d + [αnk ]MP
+.
+Nd + αMP
+
+P (zt = k|z −t , w, αn, βm) ∝
+{Nwt |wt−1 ,k }−t + βmwt {Nk|dt }−t + αnk
+{Nk }−t + β
+{Ndt }−t + α
+
+(28)
+
+or (prior 2)
+P (zt = k|z −t , w, αn, {βk mk }) ∝
+
+(27)
+
+4. Inference of Hyperparameters
+Previous sampling-based treatments of latent Dirichlet
+allocation have not included any method for optimizing hyperparameters. However, the method described
+in this section may be applied to both latent Dirichlet
+allocation and the model presented in this paper.
+Given an uninformative prior over αn and βm or
+{βk mk }, the optimal hyperparameters, [αn]MP and
+[βm]MP or {[βk mk ]MP }, may be found by maximizing the evidence, given in equation (23) or (24).
+The evidence contains latent variables z and must
+therefore be maximized with respect to the hyperparameters using an expectation-maximization (EM) algorithm. Unfortunately, the expectation with respect
+to the distribution over the latent variables involves a
+sum over T N terms, where N is the number of words in
+the entire corpus. However, this sum may be approximated using a Markov chain Monte Carlo algorithm,
+such as Gibbs sampling, resulting in a Gibbs EM algorithm (Andrieu et al., 2003). Given a corpus w, and
+denoting the set of hyperparameters as U = {αn, βm}
+or U = {αn, {βk mk }}, the optimal hyperparameters
+may be found by using the following steps:
+1. Initialize z (0) and U (0) and set i = 1.
+
+Gibbs sampling involves sequentially sampling each
+variable of interest, zt here, from the distribution over
+that variable given the current values of all other variables and the data. Letting the subscript −t denote a
+quantity that excludes data from the tth position, the
+conditional posterior for zt is either (prior 1)
+
+{Nwt |wt−1 ,k }−t + βk mwt |k {Nk|dt }−t + αnk
+. (29)
+{Nwt−1 ,k }−t + βk
+{Ndt }−t + α
+Drawing a single set of topics z takes time proportional
+to the size of the corpus N and the number of topics
+T . The E-step therefore takes time proportional to N ,
+T and the number of iterations for which the Markov
+chain is run in order to obtain the S samples.
+Note that the samples used to approximate the E-step
+must come from a single Markov chain. The model
+is unaffected by permutations of topic indices. Consequently, there is no correspondence between topic
+indices across samples from different Markov chains:
+topics that have index k in two different Markov chains
+need not have similar distributions over words.
+4.2. M-Step
+Given {z (s) }Ss=1 , the optimal αn can be computed using the fixed-point iteration
+[αnk ]new =
+P P 
+αnk
+
+
+(s)
+Ψ(N
++
+αn
+)
+−
+Ψ(αn
+)
+k
+k
+s
+d
+k|d
+P P
+,
+(Ψ(N
+d + α) − Ψ(α))
+s
+d
+
+(s)
+
+(30)
+
+where Nk|d is the number of times topic k has been
+used in document d in the sth sample. Similar fixedpoint iterations can be used to determine [βmi ]MP and
+{[βk mk ]MP } (Minka, 2003).
+
+Topic Modeling: Beyond Bag-of-Words
+
+In my implementation, each fixed-point iteration takes
+time that is proportional to S and (at worst) N . For latent Dirichlet allocation and the new model with prior
+1, the time taken to perform the M-step is therefore
+at worst proportional to S, N and the number of iterations taken to reach convergence. For the new model
+with prior 2, the time taken is also proportional to T .
+
+5. Experiments
+To evaluate the new model, both variants were compared with latent Dirichlet allocation and MacKay
+and Peto’s hierarchical Dirichlet language model. The
+topic models were trained identically: the Gibbs EM
+algorithm described in the previous section was used
+for both the new model (with either prior) and latent
+Dirichlet allocation. The hyperparameters of the hierarchical Dirichlet language model were inferred using
+the same fixed-point iteration used in the M-step. The
+results presented in this section are therefore a direct
+reflection of differences between the models.
+Language models are typically evaluated by computing
+the information rate of unseen test data, measured in
+bits per word: the better the predictive performance,
+the fewer the bits per word. Information rate is a
+direct measure of text compressibility. Given corpora
+w and wtest , information rate is defined as
+R=−
+
+log2 P (wtest |w)
+,
+Ntest
+
+(31)
+
+where Ntest is the number of words in the test corpus.
+The information rate may be computed directly for the
+hierarchical Dirichlet language model. For the topic
+models, computing P (wtest |w) requires summing over
+z and z test . As mentioned before, this is intractable.
+Instead, the information rate may be computed using a single set of topics z for the training data, in
+this case obtained by running a Gibbs sampler for
+20000 iterations after the hyperparameters have been
+inferred. Given z, multiple sets of topics for the test
+(s)
+data {z test }Ss=1 may be obtained using the predictive
+distributions. Given hyperparameters U , P (wtest |w)
+may be approximated by taking the harmonic mean of
+(s)
+{P (wtest |z test , w, z, U )}Ss=1 (Kass & Raftery, 1995).
+5.1. Corpora
+The models were compared using two data sets. The
+first was constructed by drawing 150 abstracts (documents) at random from the Psychological Review Abstracts data provided by Griffiths and Steyvers (2005).
+A subset of 100 documents were used to infer the hyperparameters, while the remaining 50 were used for
+evaluating the models. The second data set consisted
+
+of 150 newsgroup postings, drawn at random from the
+20 Newsgroups data (Rennie, 2005). Again, 100 documents were used for inference, while 50 were retained
+for evaluating predictive accuracy.
+Punctuation characters, including hyphens and apostrophes, were treated as word separators, and each
+number was replaced with a special “number” token
+to reduce the size of the vocabulary. To enable evaluation using documents containing tokens not present in
+the training corpus, all words that occurred only once
+in the training corpus were replaced with an “unseen”
+token u. Preprocessing the Psychological Review Abstracts data in this manner resulted in a vocabulary of
+1374 words, which occurred 13414 times in the training corpus and 6521 times in the documents used for
+testing. The 20 Newsgroups data ended up with a vocabulary of 2281 words, which occurred 27478 times
+in the training data and 13579 times in the test data.
+Despite consisting of the same number of documents,
+the 20 Newsgroups corpora are roughly twice the size
+of the Psychological Review Abstracts corpora.
+5.2. Results
+The experiments involving latent Dirichlet allocation
+and the new model were run with 1 to 120 topics, on
+an Opteron 254 (2.8GHz). These models all required
+at most 200 iterations of the Gibbs EM algorithm described in section 4. In the E-step, a Markov chain was
+run for 400 iterations. The first 200 iterations were discarded and 5 samples were taken from the remaining
+iterations. The mean time taken for each iteration is
+shown for both variants of the new model as a function of the number of topics in figure 2. As expected,
+the time taken is proportional to both the number of
+topics and the size of the corpus.
+The information rates of the test data are shown in
+figure 1. On both corpora, latent Dirichlet allocation
+and the hierarchical Dirichlet language model achieve
+similar performance. With prior 1, the new model improves upon this by between 0.5 and 1 bits per word.
+However, with prior 2, it achieves an information rate
+reduction of between 1 and 2 bits per word. For latent
+Dirichlet allocation, the information rate is reduced
+most by the first 20 topics. The new model uses a
+larger number of topics and exhibits a greater information rate reduction as more topics are added. In latent
+Dirichlet allocation, the latent topic for a given word
+is inferred using the identity of the word, the number
+of times the word has previously been assumed to be
+generated by each topic, and the number of times each
+topic has been used in the current document. In the
+new model, the previous word is also taken into ac-
+
+Topic Modeling: Beyond Bag-of-Words
+12
+
+12
+11
+
+10
+
+bits per word
+
+bits per word
+
+11
+
+13
+Hierarchical Dirichlet language model
+Latent Dirichlet allocation
+Bigram topic model (prior 1)
+Bigram topic model (prior 2)
+
+9
+8
+
+10
+9
+8
+
+7
+6
+0
+
+Hierarchical Dirichlet language model
+Latent Dirichlet allocation
+Bigram topic model (prior 1)
+Bigram topic model (prior 2)
+
+7
+20
+
+40
+60
+80
+number of topics
+
+100
+
+6
+0
+
+120
+
+20
+
+40
+60
+80
+number of topics
+
+100
+
+120
+
+Figure 1. Information rates of the test data, measured in bits per word, under the different models versus number of
+topics. Left: Psychological Review Abstracts data. Right: 20 Newsgroups data.
+30
+Psychological Review Abstracts
+20 Newsgroups
+
+mean seconds per iteration
+
+mean seconds per iteration
+
+15
+
+10
+
+5
+
+0
+0
+
+20
+
+40
+60
+80
+number of topics
+
+100
+
+120
+
+25
+
+Psychological Review Abstracts
+20 Newsgroups
+
+20
+15
+10
+5
+0
+0
+
+20
+
+40
+60
+80
+number of topics
+
+100
+
+120
+
+Figure 2. Mean time taken to perform a single iteration of the Gibbs EM algorithm described in section 4 as a function
+of the number of topics for both variants of the new model. Left: prior 1. Right: prior 2.
+
+count. This additional information means words that
+were considered to be generated by the same topic in
+latent Dirichlet allocation, may now be assumed to
+have been generated by different topics, depending on
+the contexts in which they are seen. Consequently, the
+new model tends to use a greater number of topics.
+In addition to comparing predictive accuracy, it is instructive to look at the inferred topics. Table 1 shows
+the words most frequently assigned to a selection of
+topics extracted from the 20 Newsgroups training data
+by each of the models. The “unseen” token was omitted. The topics inferred using latent Dirichlet allocation contain many function words, such as “the”,
+“in” and “to”. In contrast, all but one of the topics inferred by the new model, especially with prior
+2, typically contain fewer function words. Instead,
+these are largely collected into the single remaining
+topic, shown in the last column of rows 2 and 3 in table 1. This effect is similar, though less pronounced,
+to that achieved by Griffiths et al.’s composite model
+(2004), in which function words are handled by a hid-
+
+den Markov model, while content words are handled
+by latent Dirichlet allocation.
+
+6. Future Work
+There is a another possible prior over Φ, in addition
+to the two priors discussed in this paper. This prior
+has a hyperparameter vector for each previous word
+context j, resulting in W hyperparameter vectors:
+YY
+P (Φ|{βj mj }) =
+Dirichlet(φj,k |βj mj ). (32)
+j
+
+k
+
+Here, information is shared between all distributions
+with previous word context j. This prior captures the
+notion of common bigrams—word pairs that always
+occur together. However, the number of hyperparameter vectors is extremely large—much larger than the
+number of hyperparameters in prior 2—with comparatively little data from which to infer them. To make
+effective use of this prior, each normalized measure mj
+should itself be assigned a Dirichlet prior. This variant
+of the model could be compared with those presented
+
+Topic Modeling: Beyond Bag-of-Words
+
+in this paper. To enable a direct comparison, Dirichlet
+hyperpriors could also be placed on the hyperparameters of the priors described in section 3.
+
+7. Conclusions
+Creating a single model that integrates bigram-based
+and topic-based approaches to document modeling has
+several benefits. Firstly, the predictive accuracy of the
+new model, especially when using prior 2, is significantly better than that of either latent Dirichlet allocation or the hierarchical Dirichlet language model.
+Secondly, the model automatically infers a separate
+topic for function words, meaning that the other topics are less dominated by these words.
+
+Acknowledgments
+Thanks to Phil Cowans, David MacKay and Fernando
+Pereira for useful discussions. Thanks to Andrew
+Suffield for providing sparse matrix code.
+
+References
+Andrieu, C., de Freitas, N., Doucet, A., & Jordan, M. I.
+(2003). An introduction to MCMC for machine learning.
+Machine Learning, 50, 5–43.
+Blei, D. M., Ng, A. Y., & Jordan, M. I. (2003). Latent
+Dirichlet allocation. Journal of Machine Learning Research, 3, 993–1022.
+Griffiths, T. L., & Steyvers, M. (2004). Finding scientific
+topics. Proceedings of the National Academy of Sciences,
+101, 5228–5235.
+Griffiths, T. L., & Steyvers, M. (2005). Topic modeling toolbox. http://psiexp.ss.uci.edu/research/
+programs_data/toolbox.htm.
+Griffiths, T. L., Steyvers, M., Blei, D. M., & Tenenbaum,
+J. B. (2004). Integrating topics and syntax. Advances
+in Neural Information Processing Systems.
+Jelinek, F., & Mercer, R. (1980). Interpolated estimation of Markov source parameters from sparse data. In
+E. Gelsema and L. Kanal (Eds.), Pattern recognition in
+practice, 381–402. North-Holland publishing company.
+Kass, R. E., & Raftery, A. E. (1995). Bayes factors. Journal
+of the American Statistical Association, 90, 773–795.
+MacKay, D. J. C., & Peto, L. C. B. (1995). A hierarchical
+Dirichlet language model. Natural Language Engineering, 1, 289–307.
+Minka, T. P. (2003).
+Estimating a Dirichlet distribution. http://research.microsoft.com/~minka/
+papers/dirichlet/.
+Rennie, J. (2005). 20 newsgroups data set. http://
+people.csail.mit.edu/jrennie/20Newsgroups/.
+
+Table 1. Top: The most commonly occurring words in
+some of the topics inferred from the 20 Newsgroups training data by latent Dirichlet allocation. Middle: Some of
+the topics inferred from the same data by the new model
+with prior 1. Bottom: Some of the topics inferred by the
+new model with prior 2. Each column represents a single topic, and words appear in order of frequency of occurrence. Content words are in bold. Function words,
+which are not in bold, were identified by their presence on
+a standard list of stop words: http://ir.dcs.gla.ac.uk/
+resources/linguistic_utils/stop_words. All three sets
+of topics were taken from models with 90 topics.
+
+Latent Dirichlet allocation
+the
+“number”
+in
+to
+espn
+hockey
+a
+this
+as
+run
+
+i
+is
+satan
+the
+which
+and
+of
+metaphorical
+evil
+there
+
+that
+proteins
+the
+of
+to
+i
+if
+“number”
+you
+fact
+
+easter
+ishtar
+a
+the
+have
+with
+but
+english
+and
+is
+
+Bigram topic model (prior 1)
+to
+party
+arab
+not
+power
+any
+i
+is
+this
+things
+
+the
+god
+is
+belief
+believe
+use
+there
+strong
+make
+i
+
+the
+and
+between
+warrior
+enemy
+battlefield
+a
+of
+there
+way
+
+the
+a
+to
+i
+of
+“number”
+is
+in
+and
+it
+
+Bigram topic model (prior 2)
+party
+arab
+power
+as
+arabs
+political
+are
+rolling
+london
+security
+
+god
+believe
+about
+atheism
+gods
+before
+see
+atheist
+most
+shafts
+
+“number”
+the
+tower
+clock
+a
+power
+motherboard
+mhz
+socket
+plastic
+
+the
+to
+a
+and
+of
+i
+is
+“number”
+it
+that
+
+
