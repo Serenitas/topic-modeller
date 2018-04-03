@@ -7,17 +7,22 @@ out_dictionary = 'dict.txt'
 out_lemmatized = 'lemmed.txt'
 out_ngrams = 'ngrams.txt'
 
-mystem_path = './mystem.exe'
+stopwords_file = 'stop_words.txt'
+
+mystem_path = './mystem' #'./mystem.exe' для Windows
 args_lemmatize = [mystem_path, '-ld', out_file, out_lemmatized]
 args_dictionary = [mystem_path, '-indl',  out_file, out_dictionary]
 
-python_path = './venv2/Scripts/python.exe'
+python_path = 'python' #'./venv/Scripts/python.exe' для Windows
 turbotopics_path = './turbotopics/compute_ngrams.py'
 args_turbotopics = [python_path, turbotopics_path, '--corpus=' + out_lemmatized, '--pval=0.001', '--min-count=30',
                     '--out=' + out_ngrams]
 
 
 def clean_text(text):
+    stopwords = open(stopwords_file, mode='r', encoding='utf-8').read()
+    stopwords = stopwords.split('\n')
+
     cur_word = ''
     result = ''
     for c in text:
@@ -27,7 +32,8 @@ def clean_text(text):
         elif c.isdigit():
             cur_word = ''
         elif cur_word != '':
-            result = result + ' ' + cur_word.strip()
+            if not cur_word in stopwords:
+                result = result + ' ' + cur_word.strip()
             cur_word = ''
     return result
 
