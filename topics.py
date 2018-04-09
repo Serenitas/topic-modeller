@@ -6,12 +6,14 @@ import time
 import glob
 import os
 import matplotlib.pyplot as plt
+import pymystem3 as mystem
 
 batch_vectorizer = artm.BatchVectorizer(data_path='lemmed.txt', data_format='vowpal_wabbit', target_folder='batches')
 
 dictionary = batch_vectorizer.dictionary
 
-topic_num = 10
+topic_num = 6
+tokens_num = 50
 
 topic_names = ['topic_{}'.format(i) for i in range(topic_num)]
 model_artm = artm.ARTM(topic_names=topic_names, dictionary=dictionary, cache_theta=True)
@@ -22,7 +24,7 @@ model_lda = artm.LDA(num_topics=topic_num)
 model_artm.scores.add(artm.PerplexityScore(name='perplexity_score', dictionary=dictionary))
 model_artm.scores.add(artm.SparsityPhiScore(name='sparsity_phi_score'))
 model_artm.scores.add(artm.SparsityThetaScore(name='sparsity_theta_score'))
-model_artm.scores.add(artm.TopTokensScore(name='top_tokens_score'))
+model_artm.scores.add(artm.TopTokensScore(name='top_tokens_score', num_tokens=tokens_num))
 model_artm.scores.add(artm.TopicKernelScore(name='topic_kernel_score', probability_mass_threshold=0.3))
 
 model_plsa.scores.add(artm.PerplexityScore(name='perplexity_score', dictionary=dictionary))
@@ -135,23 +137,68 @@ for topic in doc_topics:
             prob = doc.split('|')[1]
             docs[int(index)].append(topic_name + '|' + prob)
 
-tokens = model_artm.score_tracker['top_tokens_score'].last_tokens
+all_tokens = model_artm.score_tracker['top_tokens_score'].last_tokens
+ready_tokens = model_artm.score_tracker['top_tokens_score'].last_tokens
+for topic in all_tokens.keys():
+    tokens = all_tokens[topic]
+    ready_tokens[topic] = tokens[:10]
 
+ngrams = open('adapted.txt', mode='r', encoding='utf-8').read().split('\n')
+lemmer = mystem.Mystem()
+topicfile = open('topics.txt', mode='w', encoding='utf-8')
+tokens = []
 
-
+for ngram in ngrams:
+    if ngram == '':
+        continue
+    for topic in all_tokens.keys():
+        tokens = all_tokens[topic]
+        all_in = True
+        for word in ngram.strip('\n').split(' '):
+            if lemmer.lemmatize(word)[0] not in tokens:
+                all_in = False
+                break
+        if all_in:
+            ready_tokens[topic].append(ngram)
 i = 0
+
+for topic in ready_tokens.keys():
+    topicfile.write(topic)
+    topicfile.write(str(ready_tokens[topic]))
+    topicfile.write('\n')
+
+lemmed = open('lemmed.txt', mode='r', encoding='utf-8').readlines()
+
+
+
 for filename in filenames:
+    keywords = []
     filename = filename.strip('\n')
     print(filename + ": ")
     print(docs[i])
+    words = lemmed[i].strip('\n').split(' ')
     for topic in docs[i]:
         topic = topic.split('|')
         print(topic[0] + ':')
-        top_tokens = tokens[topic[0]]
-        print(top_tokens)
-
+        top_tokens = ready_tokens[topic[0]]
+        for tok in top_tokens:
+            if tok not in keywords:
+                if  ' ' not in tok:
+                   if tok in words:
+                       print(tok)
+                       keywords.append(tok)
+                else:
+                    allin = True
+                    for w in tok.split(' '):
+                        if w == '':
+                            continue
+                        if lemmer.lemmatize(w)[0] not in words:
+                            allin = False
+                            break
+                    if allin:
+                        print(tok)
+                        keywords.append(tok)
     i = i + 1
-
 
 
 
