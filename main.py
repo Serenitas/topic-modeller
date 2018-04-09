@@ -1,7 +1,7 @@
 import corpora_builder, ngram_adapter
 from time import time
 
-directory = 'texts'
+directory = 'all_texts'
 out_file = 'corpora.txt'
 out_dictionary = 'dict.txt'
 out_lemmatized = 'lemmed.txt'

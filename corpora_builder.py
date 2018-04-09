@@ -1,11 +1,11 @@
 import os, subprocess
 import pymystem3 as mystem
 
-directory = 'texts'
 out_file = 'corpora.txt'
 out_dictionary = 'dict.txt'
 out_lemmatized = 'lemmed.txt'
 out_ngrams = 'ngrams.txt'
+out_names = 'filenames.txt'
 
 stopwords_file = 'stop_words.txt'
 
@@ -43,13 +43,14 @@ def build_corpora(directory):
 
     out = open(out_file, mode='w', encoding='utf-8')
     out_lem = open(file=out_lemmatized, encoding='utf-8', mode='w')
+    out_filenames = open(out_names, encoding='utf-8', mode='w')
 
     #printing corpora
     for file in os.scandir("./" + directory):
         if os.DirEntry.is_file(file):
             text = open(file, mode='r', encoding='utf-8').read()
             out.write(file.name + clean_text(text) + '\n')
-
+            out_filenames.write(file.name + '\n')
             #printing lemmed
 
             lemmer = mystem.Mystem()
@@ -63,5 +64,3 @@ def build_corpora(directory):
     subprocess.run(args_dictionary)
     #printing ngrams
     subprocess.run(args_turbotopics)
-
-build_corpora(directory)

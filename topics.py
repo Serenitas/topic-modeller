@@ -7,19 +7,16 @@ import glob
 import os
 import matplotlib.pyplot as plt
 
-batch_vectorizer = artm.BatchVectorizer(data_path='lemmed.txt',
-                                        data_format='vowpal_wabbit',
-                                        collection_name="mmro",
-                                        target_folder='vw.mmro')
-
+batch_vectorizer = artm.BatchVectorizer(data_path='lemmed.txt', data_format='vowpal_wabbit', target_folder='batches')
 
 dictionary = batch_vectorizer.dictionary
 
-topic_num = 4
+topic_num = 10
 
 topic_names = ['topic_{}'.format(i) for i in range(topic_num)]
-model_artm = artm.ARTM(topic_names=topic_names, dictionary=dictionary)
-model_plsa = artm.ARTM(topic_names=topic_names, cache_theta=True, scores=[artm.PerplexityScore(name='PerplexityScore', dictionary=dictionary)])
+model_artm = artm.ARTM(topic_names=topic_names, dictionary=dictionary, cache_theta=True)
+model_plsa = artm.ARTM(topic_names=topic_names, cache_theta=True,
+                       scores=[artm.PerplexityScore(name='PerplexityScore', dictionary=dictionary)])
 model_lda = artm.LDA(num_topics=topic_num)
 
 model_artm.scores.add(artm.PerplexityScore(name='perplexity_score', dictionary=dictionary))
@@ -39,26 +36,28 @@ model_artm.regularizers.add(artm.SmoothSparseThetaRegularizer(name='sparse_theta
 model_artm.regularizers.add(artm.DecorrelatorPhiRegularizer(name='decorrelator_phi_regularizer'))
 
 model_artm.regularizers['sparse_phi_regularizer'].tau = 0.01
-model_artm.regularizers['sparse_theta_regularizer'].tau = -0.65
-#model_artm.regularizers['decorrelator_phi_regularizer'].tau = 1e+5
+model_artm.regularizers['sparse_theta_regularizer'].tau = -1.06
+# model_artm.regularizers['decorrelator_phi_regularizer'].tau = 1e+5
 
 model_plsa.initialize(dictionary=dictionary)
 model_artm.initialize(dictionary=dictionary)
 model_lda.initialize(dictionary=dictionary)
 
-passes = 50
+passes = 10
 model_plsa.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=passes)
 model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=passes)
 model_lda.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=passes)
 
 def print_measures(model_plsa, model_artm, model_lda):
-    print ('Sparsity Phi: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
+    print ('Sparsity Phi: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
         model_plsa.score_tracker['sparsity_phi_score'].last_value,
-        model_artm.score_tracker['sparsity_phi_score'].last_value))
+        model_artm.score_tracker['sparsity_phi_score'].last_value,
+        model_lda.sparsity_phi_last_value))
 
-    print ('Sparsity Theta: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
+    print ('Sparsity Theta: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
         model_plsa.score_tracker['sparsity_theta_score'].last_value,
-        model_artm.score_tracker['sparsity_theta_score'].last_value))
+        model_artm.score_tracker['sparsity_theta_score'].last_value,
+        model_lda.sparsity_theta_last_value))
 
     print ('Kernel contrast: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
         model_plsa.score_tracker['topic_kernel_score'].last_average_contrast,
@@ -68,12 +67,20 @@ def print_measures(model_plsa, model_artm, model_lda):
         model_plsa.score_tracker['topic_kernel_score'].last_average_purity,
         model_artm.score_tracker['topic_kernel_score'].last_average_purity))
 
+    print('Kernel size: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
+        model_plsa.score_tracker['topic_kernel_score'].last_average_size,
+        model_artm.score_tracker['topic_kernel_score'].last_average_size))
+
+    print('Coherence: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
+        model_plsa.score_tracker['topic_kernel_score'].last_average_coherence,
+        model_artm.score_tracker['topic_kernel_score'].last_average_coherence))
+
     print ('Perplexity: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
         model_plsa.score_tracker['perplexity_score'].last_value,
         model_artm.score_tracker['perplexity_score'].last_value,
         model_lda.perplexity_last_value))
 
-    first_score = 5
+    first_score = 0
 
     plt.plot(range(first_score, model_plsa.num_phi_updates),
              model_plsa.score_tracker['perplexity_score'].value[first_score:], 'b--',
@@ -81,82 +88,110 @@ def print_measures(model_plsa, model_artm, model_lda):
              model_artm.score_tracker['perplexity_score'].value[first_score:], 'r--',
              range(first_score, len(model_lda.perplexity_value)),
              model_lda.perplexity_value[first_score:], 'g--', linewidth=1)
-    plt.xlabel('Iterations count')
-    plt.ylabel('PLSA perp. (blue), ARTM perp. (red), LDA perp. (green)')
+    plt.xlabel('Число итераций')
+    plt.ylabel('Перплексия')
     plt.grid(True)
     plt.show()
 
-print_measures(model_plsa, model_artm, model_lda)
 
-# best_tau_phi = -5.0
-# best_tau_theta = -5.0
-# best_perplexity = 10000
-#
-# print("Started parameters choosing")
-#
-# for i in range(-20, 20, 5):
-#     for j in range(-20, 20, 5):
-#      model.regularizers['sparse_phi_regularizer'].tau = (i / 10.0)
-#      model.regularizers['sparse_theta_regularizer'].tau = (j / 10.0)
-#      model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
-#      if model.score_tracker['perplexity_score'].last_value < best_perplexity:
-#          best_perplexity = model.score_tracker['perplexity_score'].last_value
-#          best_tau_phi = (i / 10.0)
-#          best_tau_theta = (j / 10.0)
-#          print(best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
-#
-# print("RESULT 1 ", best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
-#
-# for i in range(int(10 * best_tau_phi) - 5, int(10 * best_tau_phi) + 5, 1):
-#     for j in range(int(10 * best_tau_theta) - 5, int(10 * best_tau_theta) + 5, 1):
-#         model.regularizers['sparse_phi_regularizer'].tau = (i / 10.0)
-#         model.regularizers['sparse_theta_regularizer'].tau = (j / 10.0)
-#         model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
-#         if model.score_tracker['perplexity_score'].last_value < best_perplexity:
-#             best_perplexity = model.score_tracker['perplexity_score'].last_value
-#             best_tau_phi = (i / 10.0)
-#             best_tau_theta = (j / 10.0)
-#             print(best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
-#
-# print("RESULT 2 ", best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
-#
-# for i in range(int(100 * best_tau_phi) - 10, int(100 * best_tau_phi) + 10, 1):
-#     for j in range(int(100 * best_tau_theta) - 10, int(100 * best_tau_theta) + 10, 1):
-#         model.regularizers['sparse_phi_regularizer'].tau = (i / 100.0)
-#         model.regularizers['sparse_theta_regularizer'].tau = (j / 100.0)
-#         model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
-#         if model.score_tracker['perplexity_score'].last_value < best_perplexity:
-#             best_perplexity = model.score_tracker['perplexity_score'].last_value
-#             best_tau_phi = (i / 100.0)
-#             best_tau_theta = (j / 100.0)
-#             print(best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
-#
-# print("RESULT 3 ", best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
+#print_measures(model_plsa, model_artm, model_lda)
 
-model_artm.regularizers['sparse_phi_regularizer'].tau = 0.01
-model_artm.regularizers['sparse_theta_regularizer'].tau = -0.65
-#model_artm.regularizers['decorrelator_phi_regularizer'].tau = 1e+5
+print(model_artm.score_tracker['top_tokens_score'].last_tokens)
 
-model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
+theta = model_artm.get_theta(topic_names)
+phi = model_artm.get_phi(topic_names)
 
-model_artm.save("model.txt", "model")
-for topic_name in model_artm.topic_names:
-    print (topic_name + ': ')
-    print (model_artm.score_tracker['top_tokens_score'].last_tokens[topic_name])
+def print_docs_by_topics(topic_num, topic_names, theta, filename):
+    threshold = 1.0 / topic_num
 
-#print (model.score_tracker['perplexity_score'].value)
-#print (model.score_tracker['sparsity_phi_score'].value)
-#print (model.score_tracker['sparsity_theta_score'].value)
-#print (model.score_tracker['top_tokens_score'].last_tokens)
+    docs_by_topics_file = open(filename, mode='w', encoding='utf-8')
 
-#model.num_document_passes = 10
-#model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
+    for i in range(theta.count('columns').size):
+        docs_by_topics_file.write(topic_names[i] + ": ")
+        for j in range(theta.count('index').size):
+                if theta[j][i] > threshold:
+                    docs_by_topics_file.write(str(j) + "|" + str(theta[j][i]) + ' ')
+        docs_by_topics_file.write('\n')
 
-#print ("R1", model.score_tracker['perplexity_score'].value)
 
-#model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=100)
+print_docs_by_topics(topic_num, topic_names, theta, 'topics_by_docs.txt')
 
-#print ("R2", model.score_tracker['perplexity_score'].value)
+filenames = open('filenames.txt', mode='r', encoding='utf-8').readlines()
+doc_topics = open('topics_by_docs.txt', mode='r', encoding='utf-8').readlines()
+
+docs = []
+for i in range(theta.count('index').size):
+    docs.append([])
+
+
+for topic in doc_topics:
+    topic = topic.strip('\n').split(' ')
+    topic_name = 'undefined'
+    for doc in topic:
+        if '|' not in doc:
+            topic_name = doc.strip(':')
+        else:
+            index = doc.split('|')[0]
+            prob = doc.split('|')[1]
+            docs[int(index)].append(topic_name + '|' + prob)
+
+tokens = model_artm.score_tracker['top_tokens_score'].last_tokens
+
+
+
+i = 0
+for filename in filenames:
+    filename = filename.strip('\n')
+    print(filename + ": ")
+    print(docs[i])
+    for topic in docs[i]:
+        topic = topic.split('|')
+        print(topic[0] + ':')
+        top_tokens = tokens[topic[0]]
+        print(top_tokens)
+
+    i = i + 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# model_artm.regularizers['sparse_phi_regularizer'].tau = 0.01
+# model_artm.regularizers['sparse_theta_regularizer'].tau = -0.65
+# model_artm.regularizers['decorrelator_phi_regularizer'].tau = 1e+5
+
+# model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
+# 
+# model_artm.save("model.txt", "model")
+# for topic_name in model_artm.topic_names:
+#     print (topic_name + ': ')
+#     print (model_artm.score_tracker['top_tokens_score'].last_tokens[topic_name])
+
+# print (model.score_tracker['perplexity_score'].value)
+# print (model.score_tracker['sparsity_phi_score'].value)
+# print (model.score_tracker['sparsity_theta_score'].value)
+# print (model.score_tracker['top_tokens_score'].last_tokens)
+
+# model.num_document_passes = 10
+# model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
+
+# print ("R1", model.score_tracker['perplexity_score'].value)
+
+# model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=100)
+
+# print ("R2", model.score_tracker['perplexity_score'].value)
 
 # t1 = time.time()
 # #model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=100)
@@ -175,5 +210,48 @@ for topic_name in model_artm.topic_names:
 # print(modelLda.sparsity_theta_last_value)
 # print(modelLda.get_top_tokens())
 
+def calc_coeffs():
+    best_tau_phi = -5.0
+    best_tau_theta = -5.0
+    best_perplexity = 1000000
 
+    print("Started parameters choosing")
 
+    for i in range(-20, 20, 5):
+        for j in range(-20, 20, 5):
+            model_artm.regularizers['sparse_phi_regularizer'].tau = (i / 10.0)
+            model_artm.regularizers['sparse_theta_regularizer'].tau = (j / 10.0)
+            model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
+            if model_artm.score_tracker['perplexity_score'].last_value < best_perplexity:
+                best_perplexity = model_artm.score_tracker['perplexity_score'].last_value
+                best_tau_phi = (i / 10.0)
+                best_tau_theta = (j / 10.0)
+                print(best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
+
+    print("RESULT 1 ", best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
+
+    for i in range(int(10 * best_tau_phi) - 5, int(10 * best_tau_phi) + 5, 1):
+        for j in range(int(10 * best_tau_theta) - 5, int(10 * best_tau_theta) + 5, 1):
+            model_artm.regularizers['sparse_phi_regularizer'].tau = (i / 10.0)
+            model_artm.regularizers['sparse_theta_regularizer'].tau = (j / 10.0)
+            model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
+            if model_artm.score_tracker['perplexity_score'].last_value < best_perplexity:
+                best_perplexity = model_artm.score_tracker['perplexity_score'].last_value
+                best_tau_phi = (i / 10.0)
+                best_tau_theta = (j / 10.0)
+                print(best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
+
+    print("RESULT 2 ", best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
+
+    for i in range(int(100 * best_tau_phi) - 10, int(100 * best_tau_phi) + 10, 1):
+        for j in range(int(100 * best_tau_theta) - 10, int(100 * best_tau_theta) + 10, 1):
+            model_artm.regularizers['sparse_phi_regularizer'].tau = (i / 100.0)
+            model_artm.regularizers['sparse_theta_regularizer'].tau = (j / 100.0)
+            model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
+            if model_artm.score_tracker['perplexity_score'].last_value < best_perplexity:
+                best_perplexity = model_artm.score_tracker['perplexity_score'].last_value
+                best_tau_phi = (i / 100.0)
+                best_tau_theta = (j / 100.0)
+                print(best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
+
+    print("RESULT 3 ", best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
