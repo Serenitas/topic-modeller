@@ -1,5 +1,6 @@
 import os, subprocess
 import pymystem3 as mystem
+import time
 
 out_file = 'corpora.txt'
 out_dictionary = 'dict.txt'

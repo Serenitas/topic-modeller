@@ -8,6 +8,8 @@ import os
 import matplotlib.pyplot as plt
 import pymystem3 as mystem
 
+start = time.time()
+
 batch_vectorizer = artm.BatchVectorizer(data_path='lemmed.txt', data_format='vowpal_wabbit', target_folder='batches')
 
 dictionary = batch_vectorizer.dictionary
@@ -182,24 +184,22 @@ for filename in filenames:
         print(topic[0] + ':')
         top_tokens = ready_tokens[topic[0]]
         for tok in top_tokens:
-            if tok not in keywords:
-                if  ' ' not in tok:
-                   if tok in words:
-                       print(tok)
-                       keywords.append(tok)
-                else:
-                    allin = True
-                    for w in tok.split(' '):
-                        if w == '':
-                            continue
-                        if lemmer.lemmatize(w)[0] not in words:
-                            allin = False
-                            break
-                    if allin:
-                        print(tok)
-                        keywords.append(tok)
+            if  ' ' not in tok:
+               if tok in words:
+                   print(tok)
+            else:
+                allin = True
+                for w in tok.split(' '):
+                    if w == '':
+                        continue
+                    if lemmer.lemmatize(w)[0] not in words:
+                        allin = False
+                        break
+                if allin:
+                    print(tok)
     i = i + 1
 
+print("Time: ", time.time() - start)
 
 
 
