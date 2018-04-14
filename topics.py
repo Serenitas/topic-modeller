@@ -1,12 +1,10 @@
 #!/usr/bin/python
 
-import re
 import artm
 import time
-import glob
-import os
 import matplotlib.pyplot as plt
 import pymystem3 as mystem
+import tf_idf_builder
 
 start = time.time()
 
@@ -171,22 +169,23 @@ for topic in ready_tokens.keys():
 
 lemmed = open('lemmed.txt', mode='r', encoding='utf-8').readlines()
 
-
+tf_idf_dict = tf_idf_builder.build_td_idf_dict('lemmed.txt')
 
 for filename in filenames:
     keywords = []
     filename = filename.strip('\n')
     print(filename + ": ")
     print(docs[i])
+    print(tf_idf_dict[i][:10])
     words = lemmed[i].strip('\n').split(' ')
     for topic in docs[i]:
         topic = topic.split('|')
         print(topic[0] + ':')
         top_tokens = ready_tokens[topic[0]]
         for tok in top_tokens:
-            if  ' ' not in tok:
-               if tok in words:
-                   print(tok)
+            if ' ' not in tok:
+                if tok in words:
+                    print(tok)
             else:
                 allin = True
                 for w in tok.split(' '):

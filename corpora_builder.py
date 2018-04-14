@@ -1,6 +1,7 @@
 import os, subprocess
 import pymystem3 as mystem
 import time
+from sys import platform
 
 out_file = 'corpora.txt'
 out_dictionary = 'dict.txt'
@@ -11,10 +12,14 @@ out_names = 'filenames.txt'
 stopwords_file = 'stop_words.txt'
 
 mystem_path = './mystem' #'./mystem.exe' для Windows
+if platform == "win32":
+    mystem_path = './mystem.exe'
 args_lemmatize = [mystem_path, '-ld', out_file, out_lemmatized]
 args_dictionary = [mystem_path, '-indl',  out_file, out_dictionary]
 
 python_path = 'python' #'./venv/Scripts/python.exe' для Windows
+if platform == "win32":
+    python_path = './venv2/Scripts/python.exe'
 turbotopics_path = './turbotopics/compute_ngrams.py'
 args_turbotopics = [python_path, turbotopics_path, '--corpus=' + out_lemmatized, '--pval=0.001', '--min-count=30',
                     '--out=' + out_ngrams]
