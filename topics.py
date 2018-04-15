@@ -201,7 +201,7 @@ for filename in filenames:
     filename = filename.strip('\n')
     print(filename + ": ")
     print(docs[i])
-    topwords = tf_idf_dict[i][:10]
+    topwords = tf_idf_dict[i][:50]
     words = lemmed[i].strip('\n').split(' ')
     for topic in docs[i]:
         topic = topic.split('|')
@@ -210,19 +210,21 @@ for filename in filenames:
         size = int(tokens_num * float(prob))
         top_tokens = ready_tokens[topic[0]][:size] + ngrams_tokens[topic[0]]
         for tok in top_tokens:
+            if len(tok) < 2:
+                continue
             if ' ' not in tok:
-                if is_in(tok, topwords):
+                if is_in(tok, topwords[:10]):
                     print(tok)
             else:
                 if tok in ngrams_by_doc[filename]:
-                    isin = False
+                    all_in = True
                     for w in tok.split(' '):
                         if w == '':
                             continue
                         if is_in(lemmer.lemmatize(w)[0], topwords):
-                            isin = True
+                            all_in = False
                             break
-                    if isin:
+                    if all_in:
                         print(tok)
     i = i + 1
 
