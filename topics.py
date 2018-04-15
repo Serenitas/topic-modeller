@@ -12,9 +12,9 @@ batch_vectorizer = artm.BatchVectorizer(data_path='lemmed.txt', data_format='vow
 
 dictionary = batch_vectorizer.dictionary
 
-topic_num = 6
-tokens_num = 50
-
+topic_num = 30
+tokens_num = 100
+print("ARTM training")
 topic_names = ['topic_{}'.format(i) for i in range(topic_num)]
 model_artm = artm.ARTM(topic_names=topic_names, dictionary=dictionary, cache_theta=True)
 model_plsa = artm.ARTM(topic_names=topic_names, cache_theta=True,
@@ -50,22 +50,23 @@ model_plsa.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=
 model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=passes)
 model_lda.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=passes)
 
+
 def print_measures(model_plsa, model_artm, model_lda):
-    print ('Sparsity Phi: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
+    print('Sparsity Phi: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
         model_plsa.score_tracker['sparsity_phi_score'].last_value,
         model_artm.score_tracker['sparsity_phi_score'].last_value,
         model_lda.sparsity_phi_last_value))
 
-    print ('Sparsity Theta: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
+    print('Sparsity Theta: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
         model_plsa.score_tracker['sparsity_theta_score'].last_value,
         model_artm.score_tracker['sparsity_theta_score'].last_value,
         model_lda.sparsity_theta_last_value))
 
-    print ('Kernel contrast: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
+    print('Kernel contrast: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
         model_plsa.score_tracker['topic_kernel_score'].last_average_contrast,
         model_artm.score_tracker['topic_kernel_score'].last_average_contrast))
 
-    print ('Kernel purity: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
+    print('Kernel purity: {0:.3f} (PLSA) vs. {1:.3f} (ARTM)'.format(
         model_plsa.score_tracker['topic_kernel_score'].last_average_purity,
         model_artm.score_tracker['topic_kernel_score'].last_average_purity))
 
@@ -77,7 +78,7 @@ def print_measures(model_plsa, model_artm, model_lda):
         model_plsa.score_tracker['topic_kernel_score'].last_average_coherence,
         model_artm.score_tracker['topic_kernel_score'].last_average_coherence))
 
-    print ('Perplexity: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
+    print('Perplexity: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
         model_plsa.score_tracker['perplexity_score'].last_value,
         model_artm.score_tracker['perplexity_score'].last_value,
         model_lda.perplexity_last_value))
@@ -96,12 +97,13 @@ def print_measures(model_plsa, model_artm, model_lda):
     plt.show()
 
 
-#print_measures(model_plsa, model_artm, model_lda)
+# print_measures(model_plsa, model_artm, model_lda)
 
-print(model_artm.score_tracker['top_tokens_score'].last_tokens)
+# print(model_artm.score_tracker['top_tokens_score'].last_tokens)
 
 theta = model_artm.get_theta(topic_names)
 phi = model_artm.get_phi(topic_names)
+
 
 def print_docs_by_topics(topic_num, topic_names, theta, filename):
     threshold = 1.0 / topic_num
@@ -111,20 +113,22 @@ def print_docs_by_topics(topic_num, topic_names, theta, filename):
     for i in range(theta.count('columns').size):
         docs_by_topics_file.write(topic_names[i] + ": ")
         for j in range(theta.count('index').size):
-                if theta[j][i] > threshold:
-                    docs_by_topics_file.write(str(j) + "|" + str(theta[j][i]) + ' ')
+            if theta[j][i] > threshold:
+                docs_by_topics_file.write(str(j) + "|" + str(theta[j][i]) + ' ')
         docs_by_topics_file.write('\n')
 
 
+# for each topic prints documents in which probability of this topic greater than threshold
+print("Printing docs by topics")
 print_docs_by_topics(topic_num, topic_names, theta, 'topics_by_docs.txt')
 
+print("Computing keyphrases")
 filenames = open('filenames.txt', mode='r', encoding='utf-8').readlines()
 doc_topics = open('topics_by_docs.txt', mode='r', encoding='utf-8').readlines()
 
 docs = []
 for i in range(theta.count('index').size):
     docs.append([])
-
 
 for topic in doc_topics:
     topic = topic.strip('\n').split(' ')
@@ -139,9 +143,12 @@ for topic in doc_topics:
 
 all_tokens = model_artm.score_tracker['top_tokens_score'].last_tokens
 ready_tokens = model_artm.score_tracker['top_tokens_score'].last_tokens
-for topic in all_tokens.keys():
-    tokens = all_tokens[topic]
-    ready_tokens[topic] = tokens[:10]
+ngrams_tokens = model_artm.score_tracker['top_tokens_score'].last_tokens
+for topic in ngrams_tokens:
+    ngrams_tokens[topic] = []
+#for topic in all_tokens.keys():
+#    tokens = all_tokens[topic]
+#    ready_tokens[topic] = tokens[:10]
 
 ngrams = open('adapted.txt', mode='r', encoding='utf-8').read().split('\n')
 lemmer = mystem.Mystem()
@@ -159,7 +166,7 @@ for ngram in ngrams:
                 all_in = False
                 break
         if all_in:
-            ready_tokens[topic].append(ngram)
+            ngrams_tokens[topic].append(ngram)
 i = 0
 
 for topic in ready_tokens.keys():
@@ -169,92 +176,58 @@ for topic in ready_tokens.keys():
 
 lemmed = open('lemmed.txt', mode='r', encoding='utf-8').readlines()
 
-tf_idf_dict = tf_idf_builder.build_td_idf_dict('lemmed.txt')
+tf_idf_dict = tf_idf_builder.build_td_idf_dict(lemmed)
+
+docngrams = open(file='doc_ngrams.txt', mode='r', encoding='utf-8').read().split('\n')
+ngrams_by_doc = dict()
+for doc in docngrams:
+    if ':' not in doc:
+        continue
+    doc = doc.split(':')
+    filename = doc[0]
+    ngrams = doc[1].split('|')
+    ngrams_by_doc[filename] = ngrams
+
+
+def is_in(tok, topwords):
+    for tuple in topwords:
+        if tuple[0] == tok:
+            return True
+    return False
+
 
 for filename in filenames:
     keywords = []
     filename = filename.strip('\n')
     print(filename + ": ")
     print(docs[i])
-    print(tf_idf_dict[i][:10])
+    topwords = tf_idf_dict[i][:10]
     words = lemmed[i].strip('\n').split(' ')
     for topic in docs[i]:
         topic = topic.split('|')
         print(topic[0] + ':')
-        top_tokens = ready_tokens[topic[0]]
+        prob = topic[1]
+        size = int(tokens_num * float(prob))
+        top_tokens = ready_tokens[topic[0]][:size] + ngrams_tokens[topic[0]]
         for tok in top_tokens:
             if ' ' not in tok:
-                if tok in words:
+                if is_in(tok, topwords):
                     print(tok)
             else:
-                allin = True
-                for w in tok.split(' '):
-                    if w == '':
-                        continue
-                    if lemmer.lemmatize(w)[0] not in words:
-                        allin = False
-                        break
-                if allin:
-                    print(tok)
+                if tok in ngrams_by_doc[filename]:
+                    isin = False
+                    for w in tok.split(' '):
+                        if w == '':
+                            continue
+                        if is_in(lemmer.lemmatize(w)[0], topwords):
+                            isin = True
+                            break
+                    if isin:
+                        print(tok)
     i = i + 1
 
 print("Time: ", time.time() - start)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# model_artm.regularizers['sparse_phi_regularizer'].tau = 0.01
-# model_artm.regularizers['sparse_theta_regularizer'].tau = -0.65
-# model_artm.regularizers['decorrelator_phi_regularizer'].tau = 1e+5
-
-# model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
-# 
-# model_artm.save("model.txt", "model")
-# for topic_name in model_artm.topic_names:
-#     print (topic_name + ': ')
-#     print (model_artm.score_tracker['top_tokens_score'].last_tokens[topic_name])
-
-# print (model.score_tracker['perplexity_score'].value)
-# print (model.score_tracker['sparsity_phi_score'].value)
-# print (model.score_tracker['sparsity_theta_score'].value)
-# print (model.score_tracker['top_tokens_score'].last_tokens)
-
-# model.num_document_passes = 10
-# model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
-
-# print ("R1", model.score_tracker['perplexity_score'].value)
-
-# model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=100)
-
-# print ("R2", model.score_tracker['perplexity_score'].value)
-
-# t1 = time.time()
-# #model.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=100)
-#
-# print ("ARTM", model.score_tracker['perplexity_score'].last_value,  time.time() - t1)
-# print (model.score_tracker['sparsity_phi_score'].last_value)
-# print (model.score_tracker['sparsity_theta_score'].last_value)
-# print (model.score_tracker['top_tokens_score'].last_tokens)
-#
-# t1 = time.time()
-# modelLda = artm.LDA(num_topics=20, dictionary=dictionary)
-# modelLda.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=100)
-#
-# print("LDA", modelLda.perplexity_last_value, time.time() - t1)
-# print(modelLda.sparsity_phi_last_value)
-# print(modelLda.sparsity_theta_last_value)
-# print(modelLda.get_top_tokens())
 
 def calc_coeffs():
     best_tau_phi = -5.0
