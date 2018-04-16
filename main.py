@@ -19,5 +19,5 @@ out_ngrams_by_doc = 'doc_ngrams.txt'
 #print("Printing ngrams by doc")
 #corpora_builder.print_ngrams_by_doc(out_ngrams_by_doc, multiword_only_file, out_lemmatized)
 #print("Time:", int((time() - start) / 60), 'min', int((time() - start) % 60), 'sec')
-coefficient_calculator.calc_coeffs()
-#coefficient_calculator.experiment('lemmed.txt')
+#coefficient_calculator.calc_coeffs()
+coefficient_calculator.experiment('lemmed.txt')

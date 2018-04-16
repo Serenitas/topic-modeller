@@ -134,6 +134,33 @@ def print_measures(model_plsa, model_artm, model_lda):
     plt.grid(True)
     plt.show()
 
+    plt.plot(range(first_score, model_plsa.num_phi_updates),
+             model_plsa.score_tracker['topic_kernel_score'].average_contrast[first_score:], 'b--',
+             range(first_score, model_artm.num_phi_updates),
+             model_artm.score_tracker['topic_kernel_score'].average_contrast[first_score:], 'r--')
+    plt.xlabel('Число итераций')
+    plt.ylabel('average_contrast')
+    plt.grid(True)
+    plt.show()
+
+    plt.plot(range(first_score, model_plsa.num_phi_updates),
+             model_plsa.score_tracker['topic_kernel_score'].average_purity[first_score:], 'b--',
+             range(first_score, model_artm.num_phi_updates),
+             model_artm.score_tracker['topic_kernel_score'].average_purity[first_score:], 'r--')
+    plt.xlabel('Число итераций')
+    plt.ylabel('average_purity')
+    plt.grid(True)
+    plt.show()
+
+    plt.plot(range(first_score, model_plsa.num_phi_updates),
+             model_plsa.score_tracker['topic_kernel_score'].average_size[first_score:], 'b--',
+             range(first_score, model_artm.num_phi_updates),
+             model_artm.score_tracker['topic_kernel_score'].average_size[first_score:], 'r--')
+    plt.xlabel('Число итераций')
+    plt.ylabel('average_size')
+    plt.grid(True)
+    plt.show()
+
 
 def experiment(filename):
     batch_vectorizer = artm.BatchVectorizer(data_path=filename, data_format='vowpal_wabbit',
