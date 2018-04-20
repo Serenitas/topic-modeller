@@ -32,7 +32,7 @@ def calc_coeffs():
         for j in range(-20, 20, 5):
             model_artm.regularizers['sparse_phi_regularizer'].tau = (i / 10.0)
             model_artm.regularizers['sparse_theta_regularizer'].tau = (j / 10.0)
-            model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=1)
+            model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=100)
             if model_artm.score_tracker['perplexity_score'].last_value < best_perplexity:
                 best_perplexity = model_artm.score_tracker['perplexity_score'].last_value
                 best_tau_phi = (i / 10.0)
@@ -45,7 +45,7 @@ def calc_coeffs():
         for j in range(int(10 * best_tau_theta) - 5, int(10 * best_tau_theta) + 5, 1):
             model_artm.regularizers['sparse_phi_regularizer'].tau = (i / 10.0)
             model_artm.regularizers['sparse_theta_regularizer'].tau = (j / 10.0)
-            model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=10)
+            model_artm.fit_offline(batch_vectorizer=batch_vectorizer, num_collection_passes=100)
             if model_artm.score_tracker['perplexity_score'].last_value < best_perplexity:
                 best_perplexity = model_artm.score_tracker['perplexity_score'].last_value
                 best_tau_phi = (i / 10.0)
@@ -66,6 +66,7 @@ def calc_coeffs():
                 print(best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
 
     print("RESULT 3 ", best_perplexity, " ", best_tau_phi, " ", best_tau_theta)
+    return {"tau_phi": best_tau_phi, "tau_theta": best_tau_theta}
 
 def print_measures(model_plsa, model_artm, model_lda):
     print('Sparsity Phi: {0:.3f} (PLSA) vs. {1:.3f} (ARTM) vs. {2:.3f} (LDA)'.format(
@@ -98,10 +99,6 @@ def print_measures(model_plsa, model_artm, model_lda):
         model_plsa.score_tracker['background_tokens_ratio_score'].last_value,
         model_artm.score_tracker['background_tokens_ratio_score'].last_value))
 
-    #percent_plsa = (int(model_plsa.score_tracker['class_precision_score'].last_error) / int(
-        #model_plsa.score_tracker['class_precision_score'].last_total)) * 100
-    #percent_artm = (int(model_artm.score_tracker['class_precision_score'].last_error) / int(
-        #model_artm.score_tracker['class_precision_score'].last_total)) * 100
     print('Class precision: {0:.3f} of {1:.3f} errors (PLSA) vs. {2:.3f} of {3:.3f} errors (ARTM)'.format(
         model_plsa.score_tracker['class_precision_score'].last_error,
         model_artm.score_tracker['class_precision_score'].last_error,
@@ -161,8 +158,26 @@ def print_measures(model_plsa, model_artm, model_lda):
     plt.grid(True)
     plt.show()
 
+    plt.plot(range(first_score, model_plsa.num_phi_updates),
+             model_plsa.score_tracker['sparsity_phi_score'].value[first_score:], 'b--',
+             range(first_score, model_artm.num_phi_updates),
+             model_artm.score_tracker['sparsity_phi_score'].value[first_score:], 'r--')
+    plt.xlabel('Число итераций')
+    plt.ylabel('sparsity_phi')
+    plt.grid(True)
+    plt.show()
 
-def experiment(filename):
+    plt.plot(range(first_score, model_plsa.num_phi_updates),
+             model_plsa.score_tracker['sparsity_theta_score'].value[first_score:], 'b--',
+             range(first_score, model_artm.num_phi_updates),
+             model_artm.score_tracker['sparsity_theta_score'].value[first_score:], 'r--')
+    plt.xlabel('Число итераций')
+    plt.ylabel('sparsity_theta')
+    plt.grid(True)
+    plt.show()
+
+
+def experiment(filename, tau_phi, tau_theta):
     batch_vectorizer = artm.BatchVectorizer(data_path=filename, data_format='vowpal_wabbit',
                                             target_folder='batches')
 
@@ -199,9 +214,9 @@ def experiment(filename):
     model_artm.regularizers.add(artm.SmoothSparseThetaRegularizer(name='sparse_theta_regularizer'))
     model_artm.regularizers.add(artm.DecorrelatorPhiRegularizer(name='decorrelator_phi_regularizer'))
 
-    model_artm.regularizers['sparse_phi_regularizer'].tau = 0.01
-    model_artm.regularizers['sparse_theta_regularizer'].tau = -1.06
-    # model_artm.regularizers['decorrelator_phi_regularizer'].tau = 1e+5
+    model_artm.regularizers['sparse_phi_regularizer'].tau = tau_phi
+    model_artm.regularizers['sparse_theta_regularizer'].tau = tau_theta
+    model_artm.regularizers['decorrelator_phi_regularizer'].tau = 1e+3
 
     model_plsa.initialize(dictionary=dictionary)
     model_artm.initialize(dictionary=dictionary)

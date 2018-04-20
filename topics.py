@@ -11,7 +11,7 @@ batch_vectorizer = artm.BatchVectorizer(data_path='lemmed.txt', data_format='vow
 
 dictionary = batch_vectorizer.dictionary
 
-topic_num = 30
+topic_num = 10
 tokens_num = 100
 print("ARTM training")
 topic_names = ['topic_{}'.format(i) for i in range(topic_num)]
@@ -128,7 +128,7 @@ i = 0
 
 for topic in ready_tokens.keys():
     topicfile.write(topic)
-    topicfile.write(str(ready_tokens[topic]))
+    topicfile.write(str(ready_tokens[topic][:10] + ngrams_tokens[topic]))
     topicfile.write('\n')
 
 lemmed = open('lemmed.txt', mode='r', encoding='utf-8').readlines()
