@@ -91,12 +91,12 @@ def build_corpora(directory):
     #printing corpora
     print("Printing corpora")
     for file in os.scandir("./" + directory):
-        if os.DirEntry.is_file(file):
+        if os.DirEntry.is_file(file) and file.name != '.DS_Store':
             text = open(file, mode='r', encoding='utf-8').read()
             out.write(file.name + clean_text(text) + '\n')
             out_filenames.write(file.name + '\n')
             #printing lemmed
-            print("Printing lemmatized corpora")
+            print("Printing lemmatized:", file.name)
             lemmer = mystem.Mystem()
             lemmatized = lemmer.lemmatize(clean_text(text))
             out_lem.write(file.name + ' ')
