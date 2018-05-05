@@ -1,0 +1,128 @@
+, 004.853, 004.855.5.
+Индуктивное формирование  на основе эмпирических данных является основным способом получения новых эмпирических знаний.
+Этот способ заключается в получении общего знания о некоторой совокупности объектов на основании анализа единообразного описания конечного множества отдельных представителей этой совокупности обучающей выборки .
+Данные об объекте называют также его описанием, при этом наиболее распространенным способом описания объектов является признаковое описание.
+Также дано конечное множество возможных классов .
+Предполагается, что существует некоторая зависимость между классами и объектами, но она неизвестна, а также то, что для каждого объекта обучающей выборки задан его  правильный класс.
+При этом описание объектов обучающей выборки в той или иной степени отражает эту зависимость [4].
+Традиционные постановки задач классификации  и кластеризации  отличаются тем, что в последней разбиение множества объектов на классы неизвестно и поэтому для объектов обучающей выборки правильные классы не могут быть заданы.
+Задача кластеризации заключается в разбиении обучающей выборки на непересекающиеся подмножества  таким образом, чтобы каждый кластер состоял из схожих объектов, а объекты разных кластеров существенно отличались .
+Мики, автоматически  сформированные БЗ  могут быть использованы в интеллектуальных системах только тогда, когда они понятны экспертам соответствующих предметных областей [5].
+В этом случае эксперты смогут не только сами пользоваться такими БЗ в своей профессиональной деятельности, но и будут доверять экспертным системам, использующим модели этих знаний, а также смогут проверять выводы таких систем, сформированные подсистемами объяснений [6].
+Проведенный анализ показывает, что степень интерпретируемости описаний классов и кластеров, которые формируют существующие алгоритмы обучения  для практически полезных предметных областей, не позволяет экспертам предметных областей использовать эти описания в своей практической деятельности.
+В работе [7] рассмотрен класс моделей зависимости, имеющих вид необогащенных систем логических соотношений с параметрами.
+В этой модели описание классов или кластеров  представляет собой набор значений параметров, названный БЗ.
+Такое описание хорошо интерпретируемо по построению, что является важным достоинством подобных моделей зависимости.
+Цель алгоритма обучения для таких моделей зависимости найти значения интересных параметров, которые вместе со значениями неинтересных параметров образуют БЗ.
+Из этого следует, что качество алгоритма обучения зависит от выбранной модели зависимости.
+Эти постановки лишены недостатков традиционных постановок и представлены как частный случай задачи оценки значений параметров модели зависимости.
+При этом критерием качества обучения является близость получаемых оценок значений параметров к значениям, характеризующим предметную область, а не традиционно используемая вероятность правильной классификации решающим правилом, получаемым в результате обучения, и не качество используемой метрики.
+Эта модель является важным частным случаем онтологии, опубликованной в работе [12].
+В [11] приведены результаты экспериментального исследования  свойств разработанного алгоритма на наборах модельных данных.
+Этот алгоритм в первую очередь ориентирован на обработку ИБ с диагнозами тех заболеваний, признаки которых обладают динамикой .
+Описание клинических проявлений таких заболеваний наиболее трудоемко и сложно с точки зрения экспертов, а потому наиболее востребовано.
+Условием применимости алгоритма является хорошая обследованность ИБ, входящих в обучающую выборку.
+Если обучающая выборка содержит также и плохо обследованные ИБ, качество индуктивно сформированной БМЗ  зависит исключительно от доли хорошо обследованных ИБ в этой обучающей выборке.
+В экспериментах на модельных данных [11, 14] обычно имеется возможность генерации выборок, удовлетворяющих данному условию.
+Но для обучающих выборок реальных данных оно может не соблюдаться, поэтому перед работой алгоритма такая выборка при помощи эксперта должна быть разделена на две части на хорошо и плохо обследованные ИБ.
+В качестве входных данных алгоритма должна быть использована только первая ее часть, а для ИБ из второй части  предпринята попытка отнесения их к одному из сформированных описаний клинических проявлений заболеваний.
+Не отнесенные ни к одному описанию ИБ ввиду их неинформативности следует удалить из обучающей выборки.
+представляет собой структурный редактор информации и используется в комплексе программ в качестве сторонней компоненты .
+Онтология медицинской диагностики, приближенная к реальной, является формализацией экспертных знаний о предметной области медицинской диагностики и содержит следующие разделы: дата поступления пациента, анатомо-физиологические особенности, диагноз, история настоящего заболевания, жалобы, данные объективного обследования, лабораторные и инструментальные методы исследования, сопутствующие заболевания.
+В случае последних двух типов для признака также указывается набор его возможных значений.
+Структура и внутренний формат онтологии и ИБ совпадают.
+Различие их в том, что онтология содержит типы, интервалы и нумерованные наборы возможных значений признаков, а в ИБ указываются их номера или конкретные значения .
+из [11], используя онтологию медицинской диагностики, приближенную к реальной, преобразует обучающую выборку во внутренний формат этого алгоритма.
+Ввиду того, что в данной онтологии признаки считаются независимыми и в любой момент наблюдения любой признак имеет единственное значение, обрабатываются они также независимо.
+Поэтому каждая обучающая выборка, содержащая ИБ по конкретному заболеванию, реорганизуется в набор описаний тех признаков, которые наблюдались в ее ИБ.
+На основе таких подвыборок возможно формирование специализированных БМЗ, учитывающих особенности конкретных групп пациентов.
+из [11], на основе обучающей выборки  во внутреннем формате алгоритма обучения индуктивно формирует описания клинических проявлений соответствующих заболеваний.
+Их совокупность образует БМЗ в структурной форме, которая имеет следующий формат.
+Для каждого заболевания существует набор признаков, входящих в его клиническую картину.
+Это означает, что каждый из таких признаков хотя бы в одном из своих периодов динамики имеет хотя бы одно значение, отличное от нормы.
+Описания заболеваний, входящих в БМЗ, состоят из описаний клинических проявлений признаков, входящих в клинические картины этих заболеваний.
+ВКП соответствует типу реакций организма на данное заболевание по данному признаку.
+Описание ВКП содержит информацию о числе периодов динамики в нем, о значениях признака в этих периодах и о границах длительности этих периодов.
+При этом для каждого ВКП формируется его объяснение: указываются количество поддерживающих его ИБ, в которых этот ВКП проявился, а также номера ИБ, входящих в определяющее подмножество данного ВКП .
+Совокупность объяснений всех сформированных ВКП образует объяснение заболевания.
+Совокупность объяснений всех заболеваний образует объяснение БМЗ.
+При этом формальное представление БМЗ позволяет конвертировать его в любой формат, необходимый для использования в экспертных системах медицинской диагностики.
+Предлагаемая грамматика преобразования, созданная на основе анализа принятых в медицинской литературе описаний заболеваний, может быть изменена непосредственно в комплексе программ или же задана внешним файлом, что позволяет гибко настраивать вид результата для различных групп пользователей.
+Преобразованная БМЗ, а также используемая при ее формировании онтология медицинской диагностики сохраняются в формате MS Word.
+Представим два примера описания клинических проявлений заболеваний по наиболее важным признакам из сформированной БМЗ.
+По мнению эксперта, индуктивно сформированная БМЗ представлена в форме, понятной практикующему врачу, так, как зачастую  она бывает представлена в медицинской литературе.
+При этом полученные описания заболеваний соответствуют знаниям, имеющимся в научной и учебной медицинской литературе, а в ряде случаев дополняют их описанием динамики клинических проявлений.
+При этом полученные описания заболеваний подтверждены  реальными ИБ из обучающей выборки.
+Кроме того, формальное представление БМЗ, формируемых комплексом программ InForMedKB, позволяет использовать их в экспертных системах медицинской диагностики.
+Nowadays developments in the field of computer science are becoming increasingly important data processing algorithms are hardware/firmware implemented.
+Neural networks, fuzzy logic, genetic algorithms and a number of other information technologies recently known only to a narrow circle of specialists, have become widely used in the last decade.
+Problems solved by information systems in most cases are reduced to a series of typical ones.
+They include [1] the following: classification of images, clustering, approximation of functions, forecast, optimization, associative memory, management.
+So, problem management is complicated, in most cases it is necessary to solve a complex of tasks mentioned above in order to solve it.
+In classical training rules for fuzzy neural networks the number of production rules, type of membership functions, fuzzy inference algorithm type, etc.
+is given a priori and does not change during the network training.
+In the case of an incorrect choice of these parameters fuzzy neural networks can be ineffective for automation.
+To avoid this situation it is better to apply adaptive algorithms  of fuzzy neural networks which set up not only training parameters but also the structure of the network.
+A few basic principles of selforganization algorithms of fuzzy systems have been defined [1]: copying of training set; optimization of the number of production rules as a single parameter; overall optimization in the number of production rules and fuzzy network weights; gradually growing partitioning algorithm .
+The above stated algorithms are distinguished by very high requirements to computing resources.
+The procedure of parametric optimization search requires significant computational costs.
+In this regard, algorithms that do not require a repeated reset in case of removing or adding production rules are of value in terms of reducing computational complexity.
+Algorithms that belong to this type are stated below: reduction algorithms for fuzzy neural networks  [2]; constructive algorithms for fuzzy neural networks  [3]; fuzzy complementative adaptive algorithm of fuzzy inference [1].
+The aim of this article is to develop scientific and technical solutions aimed at improving the quality and reliability of the automatic control of dynamic objects based on improving the adaptive algorithm of fuzzy neural networks functioning as part of intelligent .
+Theoretical analysis of the intelligent ACS synthetics methodology [4] has led to the conclusion that the development and introduction of hybrid intelligent control systems that use dynamic intelligent database to convert generic concepts will allow to record specified quality parameters when exposed to uncontrollable external perturbations through intellectual correction of the system parameters.
+We propose to put the solution of automatic control problems on a hybrid ACS, which implements a complex multi-dimensional functional transformation of the input vector according to the functioning adaptive algorithm.
+The developed structure of the lower level of intelligent ACS [4] contains an adaptive neuro-fuzzy system which performs functions of an emulator of a control object inverse dynamics.
+In order to reduce the requirements for computational resources with the support of adaptive properties of the system it is necessary to develop a set of hardware and software for the intelligent ACS focused on swift corrections of production rules base structure of  of control objects inverse dynamics.
+Known developments of adaptive algorithms [13] operate in the error accumulation mode and are quite complex in terms of microprocessor-based devices implementation.
+The Wang-Mendel network [5] with a modified form of adaptive algorithm [4] has been selected as the basic structure of neuro-fuzzy emulator.
+Operation of the developed algorithm is based on the theory of sampling frequency and training frequency distribution [4].
+In the theory of control systems with discrete time it is determined that the sampling time is usually selected according to the following rule of thumb: the value must exceed the maximum frequency of the system.
+In traditional adaptive control systems parameters are adjusted once every sampling period.
+Thus the sampling rate and update rate are not separated.
+With rational training of neuromorphic structures the basic work pace of the control system is distributed to additional ranges of training iterations with the condition that the sampling period is much higher than the time it takes to conduct one training iteration.
+In this case the value is interpreted as an approximate time of training completion.
+The system transfer into classification mode is performed in case of the condition fulfillment,  taking into account the value adjustment at the end of each period of internal pace movement according to.
+ where is a current time value.
+Statistical method of structure optimization of the neuro-fuzzy rules base of intelligent ACS elements.
+In order to reduce the algorithm running time and improve its efficiency when performing parametric synthesis of asymptotically stable intelligent control systems we propose an expert method determining the concentration coefficient of membership functions and sampling limits for further adjustments to the base of the adaptiveestablished rules.
+Erroneous decisions can be determined at a stage when reliable information about the state of the object is obtained.
+Concentration ratio of phase transitions is calculated using the following procedure.
+According to this method the value characterizes a dynamic state of the object which may be classified as the state that belongs to the term with the coordinate of the maximum.
+In general, the number of possible combinations of partial solutions is.
+In the case decisions will be consisted.
+According to the developed technique it is possible to compare the membership function parameters, which have been obtained as a result of the work of the modified adaptive algorithm of the WangMendel fuzzy network and the doubling parameters obtained on the basis of statistical processing of information systems solutions of identification of the dynamic object state .
+There is an implementation of the adaptive adjustment algorithm of the neuro-fuzzy emulator vector parameters of inverse dynamics of the object with optimization of the membership functions parameters: а) initial values of the fuzzy controller parameter vector are copied to the spare array.
+At first the parameters are explicitly defined as ACS goes into working condition after performing prior configuration neurofuzzy emulator where the operator is copied by a controller; b) let's calculate the error  and according to [4]; c) weights of synaptic connections are determined; d) the structure and parameters of production rules are corrected according to intercomparison of adaptiveformed values and the result obtained on the basis of collective decision rule .
+Here is a systems operation algorithm taking into account the developed method of self-organization of neuro-fuzzy structures based on the FOREL class taxonomy algorithm.
+1.
+The first cluster with a center is created at the start of the first data pair.
+2.
+FOREL class taxonomy algorithm [7] is based on a quality criterion of taxonomy.
+objects similar to each other in their characteristics must fall into one taxon.
+The result is a spherical shape taxon.
+The sum of internal distances to all taxons is determined by the formula.
+ The essence of the criterion is that one needs to find such a partition of m objects of taxons, so that the above stated value was minimal.
+This condition is achieved by using a FOREL algorithm.
+The taxons that are defined by this algorithm have a spherical shape.
+The number of taxons depends on the radius of the spheres: the smaller the radius, the more taxons are there.
+At first the signs of objects are allocated so that the values of all the signs were in the range from zero to one.
+Then a hypersphere of the minimum radius R0 is constructed.
+It covers all the points .
+Then the spheres radius gradually decreases.
+The radius 0,9 R0 is assigned and the center of the sphere is transferred to any of the available points.
+We transfer the center of the sphere in the new gravity center and find internal points again.
+This procedure for determining the internal points and shifting the center of the sphere continues until the sphere stops, that is, until we determine that the composition of internal points and, consequently, their gravity center are not changed.
+This means that the sphere has stopped within a local maximum of dots' density of the features in space.
+The points trapped inside the sphere are declared to belong to the first taxon.
+They are excluded from further consideration.
+For remaining points the above mentioned procedure is repeated until all points are included in the taxons.
+If a result of the algorithm operation determines that the current coordinates are included in the cluster, the cluster parameters are specified according to the classical adjustment algorithm of WangMendel neuro-fuzzy network parameters [5].
+3.
+The output of the system is calculated according to resulting function that approximates the input data [4].
+4.
+In the period of time there is an integral error accumulation of the system operation and dynamic parameter settings of Wang-Mendel neuromorphic structure according to the developed method.
+5.
+System is transferred to perform steps 14 granted there is an increase of the control integral error.
+The authors has developed an efficient algorithm for neuro-fuzzy self-organizing structures.
+Self-organization algorithm provides adaptive correction of membership functions parameters with a minimal critical mistake.
+The proposed synthesis technique can be used in the design of complex intelligent control systems of dynamic objects, as well as serve as a basis for the development of efficient algorithms for intelligent control.

@@ -1,0 +1,76 @@
++ 06.
+<b>Introduction.
+Computer technologies find extensive using in wide variety of applications.
+Powerful computing machines become the integral part of any manufacturing activity.
+The result of computers manufacture activity is big volumes of data.
+Unfortunately, a little part of this data is useful for manufacturers.
+In this case Data Mining techniques help to find data that conform to expected results.
+Data mining helps to get the best results in big data processing.
+Russian and foreign literature analysis shows that Data mining gets high development level.
+And the most common techniques connected with temporal data processing.
+They are often used in transport area where data received from train monitoring have to be processed to give useful information.
+This paper proposes a new approach to solve one of the most important temporal data processing problems.
+Our approach is dedicated to anomaly detection in time series.
+Anomalies are patterns that do not conform to expected behavior and rarely encountered.
+Anomalies often represent extraordinary situations in controlled process.
+Presented technique can be used for Data mining in many areas such as diagnostics, monitoring and cyber security.
+<b>Problem statement.
+The main aim of these techniques is modeling of process behavior.
+This modeling is based on dependency finding that is difficult because of the reasons set.
+First of all, it is difficult to find normal behavior  of controlled process.
+Second, the anomalies can be clearly distinguished from normal observations in rare cases.
+And third, there are many uncertainties in process occurring in real life.
+A wide variety of anomaly detection techniques were made to solve these problems.
+For example, stochastic model based techniques are used to get an excellent solution for the first problem decision [14].
+The second problem can be solved by one-class anomaly detection techniques [5].
+A wide area of anomaly detection techniques is developed to solve the last problem of temporal Data mining.
+This is fuzzy logic [6, 7].
+Our approach combines advantages of the first two groups.
+Markov model is used in presented technique to represent process behavior.
+We have improved this model by including production rules into this model.
+Production rules help to find connections between process states that dont conform to Markov model conditions.
+<b>Markov model.
+The first type of sequences is symbolic.
+The second type is continuous or time series.
+Sequences can also be univariate, when each event in the sequence is a univariate observation, or multivariate when each event in the sequence is a multivariate observation.
+In this paper we restrict our observations with symbolic sequences.
+Therefore we can use Markov chain model for a controlled process.
+Let denote the probability that the system is in a state at time given the system is in state at time 1.
+ In [3] a hybrid stochastic model was proposed.
+SPR are based on non-Markov situations, i.e.
+they specify temporal profile from cases that dont conform to formula .
+In this case is named as-dominant.
+According to the written above, the framework of training is a stochastic model based on a behavior profile of analyzed process.
+We introduce some conditions to reduce computational complexity.
+When itwill influence classification accuracy insignificantly.
+And we replace formula  with follows.
+Formula  was presented in [8].
+It was made to develop result value robustness to small multiplier values.
+We defined the temporal behavior by opening up an observation window of size to view the last states from the current time, where is calculated as follows, where is an accuracy multiplier.
+It means that classification accuracy is high when is high.
+But unfortunately in this case it is difficult to localize the anomaly place.
+Therefore we should set to optimal accuracy/quality relation.
+In our experiments we set 5.
+Then we compute for each window according to a stochastic model.
+Windows with anomalies should have low value due to low value of its transition  probability.
+<b>Computational experiments.
+Learning and inference algorithms of the model for this process were implemented using Matlab.
+For testing one of benchmark implementation was resampled to set of 28 elements.
+Then resulting set was divided to 7 testing patterns of the same length.
+Figure 1 illustrates testing split set.
+Therefore input data was presented by 7 patterns with the length of 4 and 17 original values.
+Analyzed process was made of 5 000 random selected patterns.
+So we have 2 % anomalies from overall set.
+Figure 2 shows the difference between Pattern3 and Pattern3_wrong.
+We set by using dependence graph of from for all sequences.
+Fig.
+3 illustrates this dependence.
+As shown in Figure 3 10 has low value of.
+So in case of 10 we give similar results to the case of 10.
+Figure 4 shows the application results of our technique and Markov model based technique.
+As we can see hybrid stochastic model based technique can localize areas with <b>anomaly patterns while Markov model cant do this.
+<b>Conclusions and future work.
+We proposed one-class classification based on hybrid stochastic model of temporal behavior to solve an anomaly detection problem.
+Computational results with knowing benchmark show that our technique can distinguish areas with anomalies from normal areas.
+As for further research, a technique model can be supplemented by fuzzy components.
+In this case an approach should be more robust to uncertainties that occur in real life.

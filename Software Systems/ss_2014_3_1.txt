@@ -1,0 +1,128 @@
+
+Nowadays we can see significant growth of automation in wide range of human activities and processes [1].
+This builds up a new level of software development requirements: programming must be quicker, as cheap as possible and provide needed level of produced programs quality.
+So, these conditions make software development process automation actual.
+Such automation is partially achieved by existing high-level programming languages.
+However, increasing of abstraction level requires significant complication of translation  algorithms.
+So, we meet the problem of automatic program synthesis here.
+It is automatic or automated construction of executable program by formal specification that can also be executable.
+The main advantage of automatic synthesis is a possibility to manipulate an effect  instead of tool .
+Using of LINQ queries to objects  instead of and loops in modern versions of.
+Net framework [2] can be considered as a rough example of such change.
+There are several different methods of automatic synthesis which can be classified in three approaches [1]: deductive synthesis, where a specification is represented via theorem over input and output variables, and a program can be obtained from the proof of the theorem; inductive synthesis, where a specification is represented as a set of input-output examples and a program can be constructed by them; transformational synthesis, where a synthesis procedure must construct a new version, which is optimized by some measure.
+Also, there are some little-bit unusual approaches, like generation of program as game strategy [3].
+But most of these approaches are not very useful in practice that makes further research actual.
+At the same time, there is an interesting bioinspired approach to intelligent problem solving.
+It is  [4].
+Roughly speaking, the main idea of CBR is using known solutions for new tasks.
+In general, problem solving with CBR includes steps of so-called 4-Res cycle: Retrieving, Reusing, Revising and Remaining.
+When CBR system receives a new task it performs search of most similar task in case-memory .
+Then, the system can reuse information from known solution of and try to apply this information for constructing the solution for the task.
+This approach can be very useful in such problem domains which have no efficient theory, applicable for problem solving .
+We share an opinion [5] that CBR could be useful for a program synthesis problem.
+Obviously, search procedure is closely related to adaptation method, because we want to perform successful adaptation of a chosen case to a new task.
+Due to this, we restrict this work to the adaptation method only and leave studying of search procedure for future work.
+So, in this paper attracts attention to the method of known case adaptation to a new task.
+Our cases are known programs and the tasks are formal specifications first order logic clauses which express requirements to the synthesized program behavior.
+In program synthesis we can consider adaptation procedure as correction: for a new given specification search procedure chooses program that satisfies its specification ; if satisfies, then system can return as an answer.
+But we expect that does not satisfy and, hence, it can be considered as incorrect implementation for, that has to be corrected.
+Correction here is a transformation of to a new certain program that satisfies.
+In this paper we consider functional programs  and show adaptation of functional-logical programs correction method for such functions.
+First of all, we will describe the concepts of functional and functional logic programs, terms narrowing and relations between functions and term rewriting systems.
+We consider of functional programs synthesis.
+These are programs created from constants and variables occurs, functional calls  and conditional branching.
+This paradigm is close to mathematical concept of functions.
+Semantics of functional programs is mapping from input space to output values space.
+ languages are extensions of functional languages with logic programming principles [6, 7].
+Computing in FL-programs is based on a narrowing process that is generalization of term rewriting process.
+We need to describe several definitions here.
+Conditional term rewriting systems [7, 8] are a computation model for rule-based languages [7].
+Term rewriting system defined as a pair of and sets.
+is a complement to in.
+Let be a program and be a goal.
+We denote this fact as Also, we use denotation to express that a can be obtained from by narrowing derivation with.
+Functional logic programs are a powerful tool for solving equations.
+In this work we are going to confront functional programs with functional logic programs.
+In other words, has to narrow left hand side of such equations to a computed value of function.
+We say that a program is correct if it computes required output values for given values of input parameters.
+Correction of programs using base method, described in [7], is performed by iterative application of so-called unfolding operator.
+Unfolding is defined as follows.
+Let be the program.
+1.
+2.
+Next several definitions are required for correction process description.
+We say, that rule is discriminable if and only if is unfoldable and it occurs in narrowing derivation for at least one.
+The top-down correction algorithm that we use as a base for our adaptation technique is follows.
+Input data for processing are sets of positive and negative examples, and a program that we want to correct.
+1.
+If program does not narrow any positive example, we finish the procedure.
+The program cannot be corrected .
+2.
+Initialize current form of program with.
+3.
+Enter the main loop of algorithm unfolding phase.
+4.
+After unfolding step a deletion phase starts.
+We remove all rules from, which are used for derivation of negative examples computation.
+5.
+Then, correction procedure returns obtained program as a correct version.
+Now, we are ready to describe our adaptation of the functional logic program correction method to functional programs.
+1.
+Translation of given function to the term rewriting system form.
+Then, thus corrections will be mapped to, and obtained function would be returned as answer of system.
+2.
+Computation of negative examples set.
+We suspect that specification at this step is already represented as a set of examples.
+So, our task here is to construct positive and negative examples set from that.
+3.
+Correction of the obtained w.r.t.
+sets of positive and negative examples.
+This step consists in application of the base top-down unfolding-based correction algorithm to the obtained program and examples.
+The result of such correction is a new program.
+4.
+Translation of the obtained to a functional program, which can be computed in usual way.
+This function will be returned as answer of the system.
+At this step we construct an equivalent functional-logic program for given functional program.
+First of all, we define a values representation method.
+Since we will work with TRS, it is easier to represent numbers via special functions.
+Now we are ready to describe translation procedure.
+The first step of our correction process is translation of given functional program body to a equivalent functional logic program in form of term rewriting system.
+We split the given function to a set of components, which correspond to nodes of abstract syntactic tree of the target function body.
+These components can represent variables, function calls, constants  and conditional branching points.
+The main idea of the translation procedure is to represent these components via rules in obtained TRS: left hand sides of such rules have to represent these components and right hand sides has to describe the process of values computation for corresponding components.
+Next, since main elements of correction in base method are narrowing rules, we are interested in more detailed components splitting.
+For that we propose follow procedure.
+1.
+2.
+3.
+If did not change during previous step, we finish translation procedure, else we return to the second step.
+4.
+In order to illustrate this translation, we can consider following example.
+Since has been changed, we repeat step 2.
+Then, new iteration of step 2 will not change and we can go to step 4 and add a simple definition of the functions and.
+So, we obtain final form of program <b>.
+For that we have to split a given examples set to sets of positive and negative examples and then apply the described top-down correction algorithm.
+We suspect that correction will work with specifications, which are represented by sets of computation examples.
+Such examples can be obtained from specification in form of CTRS [7], while the last can be constructed from clause of some assertion language [9].
+That deals with general idea of our synthesis process: source program is taken from case-memory after execution of search procedure.
+Obviously, that sets of examples are an interesting base for similarity measure between cases: when user gives a set of examples to a system, the most similar case is the function, which closes the biggest part of these examples.
+So, we need to separate these examples into positive and negative sets.
+We achieve this just by application of the program to left hand sides of examples and comparing the result with corresponding right hand sides.
+For each equation in we apply the considering program, which narrows or answer.
+Examples, where narrowed the answer, we put in set of positive examples.
+Proceed to the next step in main phase of program correction.
+We apply the base top-down correction algorithm to the program, that represents source function, and the positive and negative examples sets and respectively, given by user.
+The first condition of the algorithm application is that the considering program has to derive at least one positive example.
+It was checked at  step of most similar case search and, besides that, at the examples set separation step.
+The initial form of the considering program  is our program itself.
+First phase of the algorithm is consecutive search of a discriminable rules and unfolding them with relation to a current form of the program.
+At each step of this phase we check sets for each example and perform unfolding for a discriminable rule and check intersection of them: if there are no rules that are used in derivation of a positive as well as a negative examples.
+Next phase is deletion: we remove all rules that are used in derivation of negative examples and return the obtained form of the program.
+.
+At the previous step we obtained the corrected version of the term rewriting system that represents the source function.
+Now, we have to restore a function from the obtained TRS.
+This procedure is similar unfolding, but we apply all applicable rules to right-hand side of the first rule simultaneously.
+This method can be used at reusing step of bigger program synthesis system that uses case-based reasoning approach.
+There are several problems that restrict applicability of the method for synthesis tasks: a specification has to be given in form of examples, instead of compact first-order logic clause in deductive synthesis method; the system has to perform main loop several times; the correct answer is not guaranteed; and some others.
+But we hope that considering of functional programs from term-rewriting point of view could be an efficient way for solution of a synthesis problem.
+So, our future work will be directed to solving this problems and integration of these methods in casebased program synthesis system.

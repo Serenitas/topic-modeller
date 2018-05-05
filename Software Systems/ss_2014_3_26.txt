@@ -1,0 +1,50 @@
+, 676.024.7.
+Finished product quality meets a range of requirements defined in the specifications .
+Required quality is achieved through the selection of chemicals involved in the preparation of water-fibrous pulp, maintaining of the required acidity level of water-fibrous suspension  furnishing, technological processes improvement at all stages of production, process conditions adaptation, etc.
+The analysis of the products quality and the diagnostics of the deviation reasons from the preset parameters reveals a vast number of interconnections of the result indexes from the process conditions, the source raw material characteristics, the concentration of the substances involved in the process, the level of compliance with the regulations, etc.
+In addition, technologists, operators and managers have to deal with hard formalized information in the of decision making process.
+The quality control software environment presented in this work is aimed at solving problems of control process optimization in paper and paperboard products manufacturing on the basis of recycled fiber raw materials.
+Due to the fact that there is no similar software currently, the development of customized design solutions for managing processes in paper and cardboard production is an urgent task.
+According to the finished product specifications paper and cardboard industries focus on the degree of hydrophobicity of finished products, the bond strength of paper and paperboard as well as the strength of adhesive joints [3].
+Adhesive joint affects such properties as resistance to bending moment and the vertical compression, tensile strength, bursting strength, water resistance, etc.
+Furthermore, the quality of the starch glue and the speed of splicing dependent on it determine the speed of the corrugator.
+During the process of starch glue preparation the following regulations are observed [4, 5]: the change of pasting should be in progress in small steps with careful observation of the changes; the change of the glue components number should be carried out at a constant quantity of water; if it is necessary to reduce the viscosity of the adhesive you should try first rapid mixing, and only then dilution with very small slugs of water; the most reliable way to increase the viscosity of the adhesive is mixing with newly pasted party of obviously thicker glue.
+From all has been said it follows that glue formulation is not fixed.
+A technologist must constantly adjust the glue composition and process of its preparation, take into account changes in the external factors so that the parameters of the finished glue remain within tolerances and provide production of the corrugated board of consistent quality.
+1).
+It is necessary to develop a software environment to regulate quality indicators in the context of the manufacturing of starch glue.
+It should take into account the specified limits for each parameter, , , and allow identifying the reasons for the deviation of the real value quality from the specified, ways to eliminate the reasons of parameters deviationsand identify ways of interval boundaries extension of the acceptable values for each of the indicators, taking into account the reasons of the restrictions of the rating.
+The operational algorithm of the quality control software environment is shown in figure 2.
+First phase.
+We determine the amount of, the sequence of steps of the manufacturing process that uses recycled materials.
+Let`s consider the quality control problem in the context of the starch glue manufacturing in the production of paper and cardboard products based on recycled fiber raw materials.
+It is appropriate to reduce it to the fuzzy multi-step process management problem.
+Let`s consider the multi-step process presented in figure 3.
+Let be the state space of the process, and the control space.
+Here we assume that and are solid topological spaces.
+Let be the process state at the inlet of the first stage.
+In response to the use of the optimal control at the output of the first stage the state yet unknown is formed.
+Herewith after the end of the first stage the actual state of the process is accessible to observation.
+Let`s assume that the goal of control is characterized by fuzzy goal set in space with the membership function.
+We also assume that all functions are continuous in their domain.
+The management problem is to find a sequence, , ,  of set of points, maximizing compliance of fuzzy goal, provided that the initial state is set.
+Let`s assume that in this context is a membership function of.
+<b>Remark.
+Part I.
+At this stage there provides the data processing potential obtained in the process of manufacturing of products in order to obtain the necessary information about possible deviations of this process, the reasons of the deviation of the received data from the preset data, and ways to prevent those or other consequences caused by deviations from the technological requirements.
+Part II.
+Taking into consideration the volume and completeness of the implementation of paragraph D of the first stage, the quality control software environment performs functions of searching possible solutions  to correct conditions in the process.
+It is important that the objectives and limitations are considered as fuzzy sets in the space of alternatives.
+It gives the opportunity to drop distinctions between them in generating solutions.
+The decision in turn is defined as a fuzzy set in the space of alternatives.
+It is resulting from crossing of the set of objectives and limitations.
+The problem of constructing a system of search services in the frame of the quality control software environment in this paper is interpreted as the problem of constructing a multi-step algorithm.
+Solution is a set of services generated during the operation of the multi-step system of search of the alternatives, which meets the requested requirements as high as possible.
+Following [8], we represent the solution as merging of objectives and limitations.
+Flowchart of the developed software product is shown in figure 4.
+performs the following functions: provides an opportunity to implement interconnection of the stages of the process through shared documents and directories; allows controlling the sequence of stages of the manufacturing process in accordance with the process regulations; allows recording the controlled values during the stages of the process; provides the ability to track and analyze the dynamics of the controlled variables; provides an opportunity to search and select variant for the adjustment of process in the service directory; provides an opportunity to form plates of documents containing information about the process and taken adjustments to improve the efficiency of the manufacturing process.
+DBMS Adaptive Server Anywhere 11.0F is used for prototyping of the software environment of quality control and Delphi 7 is selected as a mean of development and design, Help @ Manual 6.4.1 is used for writing and compiling the help-files.
+The software environment gives an opportunity to control and regulate the quality of the finished product, to analyze the causes of actual values deviations of the parameters from regulated ones, to detect possible violations of the process, to offer options of adjustments of products cooking, etc.
+The above is aimed to improve quality of product at all stages of the process that in turn leads to the possibility of improving the quality of finished products in paper and paperboard production.
+In addition, the system allows you to search and select optimal solutions for problems arising while analyzing the effectiveness of the process stages.
+Reduction of the quality control problem to the problem of fuzzy multistage manufacturing process management enabled us to formulate the control action of the process under consideration.
