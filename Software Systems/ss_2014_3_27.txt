@@ -1,0 +1,66 @@
+
+Drying is a separation operation which converts a solid, semi-solid or liquid feedstock into a solid product by evaporation of the liquid into a vapor phase via heat application [1, 2].
+Product moisture removal prevents the growth and reproduction of decay-causing microorganisms and minimizes many of the moisturemediated deterioration reactions.
+The moisture loss from the product brings about a substantial reduction in weight and volume and eases their handling.
+Cocoa drying is required to develop a complete chocolate flavor that appeared during the fermentation processes and to further reduce the moisture content from about 60 % to about 8 % [35].
+Drying temperatures for cocoa beans range around 3060 C depending on the process, equipment and type of beans [36].
+This is because such temperatures allow for the most conducive drying rate which is of crucial importance for the final quality of the beans.
+Very high drying rates tend to produce acidic beans  which is deleterious to the flavour.
+Too slow a drying rates on the other hand will result in beans with low acidity, poorer colour and high presence of moulds [3, 5, 7].
+Determining and predicting the drying characteristics of cocoa beans has been the subject of numerous research works [3, 4, 8, 9].
+Mathematical modeling and simulation are important tools in the development, design and analysis of cocoa drying systems.
+Although a lot of work has been done to model the temperature, moisture distributions inside cocoa beans during drying, little scientific literature on the development of user-friendly simulation software for drying of cocoa beans is available.
+This paper discusses the development of a software to predict optimum drying conditions for a bed of cocoa beans.
+To achieve this, a suitable drying model  has been specified in defining drying behavior.
+The developed software predicts the optimum drying conditions using these equations.
+With simulation an appropriate software is used to predict the real performance of a process [2].
+The simulator software developed in this work is heavily modularized  with a user friendly graphical user interface.
+The architecture of the simulator is illustrated on figure 1.
+The design and development of the simulator was done in the following stages: 1.
+Selection and designing a mathematical model to describe the drying process.
+2.
+Solving the partial differential equations using the appropriate numerical method.
+3.
+Implementing the solution in a computer program.
+4.
+Developing a data model to store the output values.
+5.
+Developing a user-friendly user interface.
+In order to effectively model the drying process, the parameters of all these components need to be considered.
+The dryer component is characterized by its size  of the drying chamber; the product flow rate  and the area of the belt covered by the product ; energy needed to heat the air and move the conveyer belt.
+The product on the other hand has an initial, final and equilibrium moisture contents; initial, maximum and exit temperatures; bulk flow rate and other drying properties such as specific heat, water activity, diffusivity, heat conductance etc.
+The drying air has a flow rate, chamber air temperature and exit temperature and relative humidity [2].
+In order to fully model the drying process, all or some the above mentioned component properties must be considered and modeled.
+As a result, engineering problems in the area of drying generally involve the calculation or prediction of one or some of these parameters using other parameters as input as shown in table 1 [2.
+Using these parameters and the appropriate laws of physics, we derived a mathematical model to be used in developing the simulator.
+In drying process modeling these mathematical equations are derived from material and energy balances, thermodynamic equilibrium relationships, transport phenomena, geometry, equipment characteristics, etc.
+Mathematical models are used in drying process modelling to predict drying parameters such as drying time, output product temperature and air humidity [10].
+Drying processes can be completely described using an appropriate mathematical drying model which is made up of differential equations of heat and mass transfer in the interior of the product and at its interphase with the drying agent.
+In this paper a mathematical model based on the Luikovs model [9, 1113] was derived and applied in the simulator.
+A bed of cocoa beans in a convective dryer is considered to be the equivalent of a homogenous hygroscopic slab.
+ Falling rate period is where the rate of evaporation of moisture is controlled by the internal moisture transfer mechanism of the beans.
+The heat and mass transfer equations are given by:  The third term on the right hand side of the equation of energy is the heat source term due to the enzymatic browning reaction in cocoa beans during drying.
+Cocoa enzymatic browning reaction properties and parameters used in this work are taken from [14].
+An algorithm as shown on figure 2 was created to implement this solution in MatLab and was used for the development of the simulator.
+MATLAB 7.12  version was used including tools such as the Partial Differential Equation  toolbox, Graphical Library and Math Library.
+MATLAB Functions  were created to perform the finite difference computation to solve the governing equations.
+After implementing the above algorithm in MatLab the code was exported to Visual basic.
+NET through a COM interface for further development of the cocoa drying simulator in Microsoft Visual Studio 2010.
+To create the database a data model was created in CodeFluent Entities.
+CodeFluent Entities is a Rapid Application Development  tool developed by SoftFluent which is integrated into Visual Studio .
+It provides code generators called producers for SQL Server, the Oracle Database and the SQL Azure to translate user models into a complete database as well as producers for.
+NET languages such as Visual Basic, C# and ASP.
+The code generation process is model-first and continuous.
+Thus it uses user declarative model as shown in figure 3 to generate a meta-model from which codes are generated using the code generators [17].
+The data model on figure 3 was then exported into a physical SQL database model.
+In this case the user will be required to input into user interface: the parameters of the dryer, drying air and product for the processing and display of the process parameters on the user interface as shown on figure 4.
+As shown on figure 4, the simulator is an advanced Windows application which incorporates the most powerful features of MATLAB, CodeFluent Entities and Visual Basic.
+NET platforms to offer a very intuitive user experience.
+It uses menus, tool bars, buttons, grids, figure viewer, etc, to provide a simpler and more intuitive interface for data input and allows the user to view results in different ways .
+With a little upgrade it can be used to model the drying of any other type of grain.
+NET, CodeFluent Entities and MATLAB 7.12 to simulate the drying process of a bed of cocoa beans in a convective dryer.
+It is based on a mathematical model derived from the Luikovs model of heat and mass transfer in a capillary porous medium.
+It will enable users to calculate drying conditions such as temperature, moisture distribution in a bed of cocoa beans as well as drying time.
+The simulator will serve as a powerful decision making tool that will be useful for engineers or operators to develop optimum drying conditions to improve the quality of cocoa beans and the final cocoa products.
+By using this tool engineers can calculate and assess the possibilities of different drying conditions to arrive at the most optimal combination of drying parameters before their real application.
+This will reduce cost and save them a lot of time.
